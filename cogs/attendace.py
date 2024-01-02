@@ -11,6 +11,10 @@ def instructor_only():
     return app_commands.check(predicate)
 
 
-class AttendanceCommands(commands.Cog):
+class AttendanceCommandsCog(commands.Cog):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+
+
+async def setup(client: commands.Bot) -> None:
+    await client.add_cog(AttendanceCommandsCog(client))

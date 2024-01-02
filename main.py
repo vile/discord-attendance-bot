@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+import asyncio
+import nest_asyncio
 
 
 class AttendanceBot(commands.Bot):
@@ -18,20 +20,24 @@ class AttendanceBot(commands.Bot):
 
         self.remove_command("help")
 
-        # Load cogs
+    async def load_extensions(self) -> None:
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
-                self.load_extension(f"cogs.{filename[:-3]}")
+                await self.load_extension(f"cogs.{filename[:-3]}")
 
-    def run(self) -> None:
-        super().run(os.getenv("DISCORD_BOT_TOKEN"))
+    async def run(self) -> None:
+        await super().run(os.getenv("DISCORD_BOT_TOKEN"))
 
 
-def main() -> None:
+async def main() -> None:
+    load_dotenv()
+
     client = AttendanceBot()
-    client.run()
+    async with client:
+        await client.load_extensions()
+        await client.run()
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    main()
+    nest_asyncio.apply()
+    asyncio.run(main())
