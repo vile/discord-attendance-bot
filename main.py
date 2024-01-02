@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+from dotenv import load_dotenv
 
 
 class AttendanceBot(commands.Bot):
@@ -23,7 +24,7 @@ class AttendanceBot(commands.Bot):
                 self.load_extension(f"cogs.{filename[:-3]}")
 
     def run(self) -> None:
-        super().run()
+        super().run(os.getenv("DISCORD_BOT_TOKEN"))
 
 
 def main() -> None:
@@ -32,4 +33,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
