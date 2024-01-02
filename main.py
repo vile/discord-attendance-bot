@@ -35,12 +35,9 @@ async def main() -> None:
     load_dotenv()
 
     # Set up simple persistence
-    shelve_handle = shelve.open("database")
-
-    if "instructors" not in shelve_handle:
-        shelve_handle["instructors"] = []
-
-    shelve_handle.close()
+    with shelve.open("database") as handle:
+        if "instructors" not in handle:
+            handle["instructors"] = []
 
     client = AttendanceBot()
     async with client:
