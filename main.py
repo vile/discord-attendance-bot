@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import asyncio
 import nest_asyncio
+import shelve
 
 
 class AttendanceBot(commands.Bot):
@@ -31,6 +32,12 @@ class AttendanceBot(commands.Bot):
 
 async def main() -> None:
     load_dotenv()
+
+    # Set up simple persistence
+    shelve_handle = shelve.open("database")
+
+    if "instructors" not in shelve_handle:
+        shelve_handle["instructors"] = []
 
     client = AttendanceBot()
     async with client:
