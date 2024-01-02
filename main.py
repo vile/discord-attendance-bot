@@ -28,6 +28,7 @@ class AttendanceBot(commands.Bot):
 
     async def run(self) -> None:
         await super().run(os.getenv("DISCORD_BOT_TOKEN"))
+        await super().tree.sync()
 
 
 async def main() -> None:
