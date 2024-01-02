@@ -93,6 +93,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
 
     # Command: show instructors
     @app_commands.command()
+    @only_instructor_or_owner()
     async def show_instructors(self, interaction: discord.Interaction) -> None:
         list_of_instructors: list[int] = shelve_get_instructors()
         formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip
