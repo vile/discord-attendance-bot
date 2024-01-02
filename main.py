@@ -40,6 +40,8 @@ async def main() -> None:
     if "instructors" not in shelve_handle:
         shelve_handle["instructors"] = []
 
+    shelve_handle.close()
+
     client = AttendanceBot()
     async with client:
         await client.load_extensions()
