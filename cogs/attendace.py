@@ -43,6 +43,20 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
         handle["snapshots"] = temp_snapshots
 
 
+def shelve_get_attendance_rate() -> float:
+    with shelve.open("database") as handle:
+        attendance_rate = handle["minimum_attendance_rate"]
+
+    return attendance_rate
+
+
+def shelve_set_attendace_rate(rate: float) -> bool:
+    with shelve.open("database") as handle:
+        handle["minimum_attendance_rate"] = rate
+
+    return rate == shelve_get_attendance_rate()
+
+
 @app_commands.guild_only()
 class AttendanceCommandsCog(
     commands.GroupCog,
@@ -51,7 +65,6 @@ class AttendanceCommandsCog(
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
         self.voice_channel = 0
-        self.attendance_threshold = 0.5  # 50% percent
 
         super().__init__()
 
@@ -191,7 +204,7 @@ class AttendanceCommandsCog(
         num_snapshots: int = len(snapshots)
         attendance_met: dict = {}
         for member, attendance_count in attendance_total.items():
-            if attendance_count / num_snapshots >= self.attendance_threshold:
+            if attendance_count / num_snapshots >= shelve_get_attendance_rate():
                 attendance_met[member] = True
             else:
                 attendance_met[member] = False
@@ -213,6 +226,35 @@ class AttendanceCommandsCog(
 
         await interaction.response.send_message(
             "Cleared attendance",
+            ephemeral=True,
+        )
+
+    @app_commands.command()
+    async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
+        attendance_rate: float = shelve_get_attendance_rate()
+
+        await interaction.response.send_message(
+            f"The current minimum attendance rate is {attendance_rate * 100:.0f}%",
+            ephemeral=True,
+        )
+
+    @app_commands.command()
+    async def set_minimum_attendance(
+        self,
+        interaction: discord.Interaction,
+        rate: app_commands.Range[float, 0.0, 1.0],
+    ) -> None:
+        success: bool = shelve_set_attendace_rate(rate)
+
+        if not success:
+            await interaction.response.send_message(
+                "There seems to have been an issue setting the attendance rate. Try again",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.send_message(
+            f"Successfully set the required attendance rate to {rate * 100:.0f}%",
             ephemeral=True,
         )
 

@@ -40,6 +40,12 @@ async def main() -> None:
         if "instructors" not in handle:
             handle["instructors"] = []
 
+        if "minimum_attendance_rate" not in handle:
+            handle["minimum_attendance_rate"] = 0.5  # percentage
+
+        if "snapshot_interval" not in handle:
+            handle["snapshot_interval"] = 3  # seconds
+
         # Always reset snapshots when bot is restarted
         handle["snapshots"] = []
 
