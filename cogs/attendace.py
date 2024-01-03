@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 
-# Helper functions
+""" Helper functions """  # fmt: skip
 def shelve_get_instructors() -> list[int]:
     with shelve.open("database") as handle:
         return handle["instructors"] if "instructors" in handle else []
@@ -44,7 +44,7 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
         handle["snapshots"] = temp_snapshots
 
 
-# Checks
+""" Command checks """  # fmt: skip
 def only_instructor_or_owner():
     def predicate(interaction: discord.Interaction) -> bool:
         return (
@@ -64,7 +64,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        print(f"[+] {self.__cog_name__} loaded")
+        logging.info(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
 
     @app_commands.command()
@@ -115,9 +115,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     async def start_session(
         self, interaction: discord.Interaction, channel: discord.VoiceChannel
     ) -> None:
-        # Check if snapshot_task loop is running
-        # If so, refuse to create another session, return
-
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
                 f"A session is already running in {self.client.get_channel(self.voice_channel).mention}. If you want to start a new session use `/{self.__cog_name__} start_session`",
@@ -125,19 +122,16 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             )
             return
 
-        # Check that an instructor is in the target `channel`
-        # If not, refuse to create session, return
-
         vc_members: list[int] = list(map(lambda member: member.id, channel.members))  # fmt: skip
         instructors: list[int] = shelve_get_instructors()
-        print(f"{vc_members=} {instructors=}")
+        logging.debug(f"{vc_members=} {instructors=}")
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in vc_members:
                 valid_instructor_in_channel = True
                 break
 
-        print(f"{valid_instructor_in_channel=}")
+        logging.debug(f"{valid_instructor_in_channel=}")
         if not valid_instructor_in_channel:
             await interaction.response.send_message(
                 f"You or another instructor needs to be in {channel.mention} to start a session",
@@ -145,10 +139,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             )
             return
 
-        # Set self.voice_channel
         self.voice_channel = channel.id
-
-        # Start snapshot_task
         self.snapshot_task.start()
 
         await interaction.response.send_message(
@@ -159,8 +150,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     @app_commands.command()
     @only_instructor_or_owner()
     async def stop_session(self, interaction: discord.Interaction) -> None:
-        # Check if task is already being canceled
-        # If so, notify user it is already being canceled, return
         if self.snapshot_task.is_being_cancelled():
             await interaction.response.send_message(
                 "This session is already being canceled, please wait",
@@ -168,8 +157,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             )
             return
 
-        # Check if snapshot_task loop is running
-        # If not, notify user that there is no session to stop, return
         if not self.snapshot_task.is_running():
             await interaction.response.send_message(
                 "There is no currently running session, so there is nothing to stop",
@@ -177,10 +164,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             )
             return
 
-        # Clear self.voice_channel
         self.voice_channel = 0
-
-        # Cancel snapshot_task
         self.snapshot_task.cancel()
 
         await interaction.response.send_message(
@@ -208,7 +192,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             )
             return
 
-        # Calculate how many times each int (user id) was in a snapshot
         attendance_total: dict = {}
         for snapshot in snapshots:
             for member in snapshot:
@@ -217,7 +200,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
                 else:
                     attendance_total[member] = 1
 
-        # Check to see if the attendance threshold was met (in reference to attendance_total per user)
         num_snapshots: int = len(snapshots)
         attendance_met: dict = {}
         for member, attendance_count in attendance_total.items():
@@ -251,17 +233,19 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     # @tasks.loop(minutes=15)
     async def snapshot_task(self) -> None:
         if self.snapshot_task.is_being_cancelled():
-            print("preventing task while being canceled")
+            logging.info(
+                "Prevented additional task loop from executing while task was being canceled"
+            )
             return
 
-        print("taking snapshot")
+        logging.debug("Taking snapshot in snapshot_task")
 
-        # Make sure an instructor is in the designated VC
-        # If not, cancel snapshot_task
         try:
             target_vc_memberlist: list[discord.Member] = self.client.get_channel(self.voice_channel).members  # fmt: skip
         except AttributeError:
-            print("couldnt get members list")
+            logging.warning(
+                "Failed to get target VC members list. Task was most likely canceled between snapshots"
+            )
             return
         members_as_ids: list[int] = list(map(lambda member: member.id, target_vc_memberlist))  # fmt: skip
         instructors: list[int] = shelve_get_instructors()
@@ -272,10 +256,11 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
                 break
 
         if not valid_instructor_in_channel:
-            print("instructor no longer in target vc")
+            logging.info(
+                "Canceling task, instructor not in target VC for current snapshot"
+            )
             self.snapshot_task.cancel()
 
-        # Save member list to shelve
         shelve_take_member_snapshot(members_as_ids)
 
     def cog_unload(self) -> None:
