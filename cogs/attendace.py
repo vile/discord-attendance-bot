@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
 import shelve
 
@@ -48,6 +48,7 @@ def only_instructor_or_owner():
 class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+        self.session_id = ""
         super().__init__()
 
     @commands.Cog.listener()
@@ -91,7 +92,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             ephemeral=True,
         )
 
-    # Command: show instructors
     @app_commands.command()
     @only_instructor_or_owner()
     async def show_instructors(self, interaction: discord.Interaction) -> None:
@@ -99,16 +99,32 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip
         await interaction.response.send_message(formatted_message, ephemeral=True)
 
-    # TODO:
-    # Command: start session
-    # returns: session_id
+    @app_commands.command()
+    @only_instructor_or_owner()
+    async def start_session(self, interaction: discord.Interaction) -> None:
+        ...
 
-    # TODO:
-    # Command: stop session (before timer has ended)
-    # param: session_id
+    @app_commands.command()
+    @only_instructor_or_owner()
+    async def stop_session(
+        self, interaction: discord.Interaction, session_id: str
+    ) -> None:
+        ...
 
-    # TODO:
-    # - Tasks
+    @tasks.loop(time=...)
+    async def snapshot_task(self) -> None:
+        ...
+
+    @snapshot_task.before_loop
+    async def before_snapshot_task(self) -> None:
+        ...
+
+    @snapshot_task.after_loop
+    async def after_snapshot_task(self) -> None:
+        ...
+
+    def cog_unload(self) -> None:
+        self.snapshot_task.cancel()
 
     async def cog_app_command_error(
         self, interaction: discord.Interaction, error: commands.CommandError
