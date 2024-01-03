@@ -1,10 +1,11 @@
-import discord
-from discord.ext import commands
-import os
-from dotenv import load_dotenv
 import asyncio
-import nest_asyncio
+import os
 import shelve
+
+import discord
+import nest_asyncio
+from discord.ext import commands
+from dotenv import load_dotenv
 
 
 class AttendanceBot(commands.Bot):
