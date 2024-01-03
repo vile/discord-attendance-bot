@@ -1,8 +1,38 @@
 import shelve
 
 import discord
-from discord import app_commands
+from discord import Interaction, app_commands
 from discord.ext import commands, tasks
+
+
+""" Shelver operations """  # fmt: skip
+def shelve_get_instructors() -> list[int]:
+    with shelve.open("database") as handle:
+        return handle["instructors"] if "instructors" in handle else []
+
+
+def shelve_add_instructor(user_id: discord.Member.id) -> bool:
+    if user_id in shelve_get_instructors():
+        return False
+
+    with shelve.open("database") as handle:
+        temp_instructors: list[int] = handle["instructors"]
+        temp_instructors.append(user_id)
+        handle["instructors"] = temp_instructors
+
+    return user_id in shelve_get_instructors()
+
+
+def shelve_remove_instructor(user_id: discord.Member.id) -> bool:
+    if not user_id in shelve_get_instructors():
+        return False
+
+    with shelve.open("database") as handle:
+        temp_instructors: list[int] = handle["instructors"]
+        temp_instructors.remove(user_id)
+        handle["instructors"] = temp_instructors
+
+    return not user_id in shelve_get_instructors()
 
 
 def shelve_take_member_snapshot(member_ids: list[int]) -> None:
@@ -11,14 +41,6 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
         snapshot: list[int] = member_ids
         temp_snapshots.append(snapshot)
         handle["snapshots"] = temp_snapshots
-
-
-""" Command checks """  # fmt: skip
-def only_instructor(self):
-    def predicate(interaction: discord.Interaction) -> bool:
-        return interaction.user.id in self.shelve_get_instructors()
-
-    return app_commands.check(predicate)
 
 
 class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
@@ -35,11 +57,10 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         await self.client.tree.sync()
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def add_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
-        success: bool = self.shelve_add_instructor(member.id)
+        success: bool = shelve_add_instructor(member.id)
         if not success:
             await interaction.response.send_message(
                 "Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
@@ -53,11 +74,10 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         )
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def remove_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
-        success: bool = self.shelve_remove_instructor(member.id)
+        success: bool = shelve_remove_instructor(member.id)
         if not success:
             await interaction.response.send_message(
                 "I couldn't remove this member. Are you sure they're an existing instructor?",
@@ -71,14 +91,15 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         )
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def show_instructors(self, interaction: discord.Interaction) -> None:
-        list_of_instructors: list[int] = self.shelve_get_instructors()
+        list_of_instructors: list[int] = shelve_get_instructors()
         formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip
+        if formatted_message == "":
+            formatted_message = "There are no instructors to show!"
+
         await interaction.response.send_message(formatted_message, ephemeral=True)
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def start_session(
         self, interaction: discord.Interaction, channel: discord.VoiceChannel
     ) -> None:
@@ -90,7 +111,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             return
 
         vc_members: list[int] = list(map(lambda member: member.id, channel.members))  # fmt: skip
-        instructors: list[int] = self.shelve_get_instructors()
+        instructors: list[int] = shelve_get_instructors()
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in vc_members:
@@ -113,7 +134,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         )
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def stop_session(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_being_cancelled():
             await interaction.response.send_message(
@@ -138,7 +158,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         )
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
@@ -184,7 +203,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         await interaction.response.send_message(message)
 
     @app_commands.command()
-    @commands.check_any(commands.is_owner(), only_instructor())
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
         with shelve.open("database") as handle:
             handle["snapshots"] = []
@@ -206,7 +224,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
         except AttributeError:
             return
         members_as_ids: list[int] = list(map(lambda member: member.id, target_vc_memberlist))  # fmt: skip
-        instructors: list[int] = self.shelve_get_instructors()
+        instructors: list[int] = shelve_get_instructors()
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in members_as_ids:
@@ -217,6 +235,13 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
             self.snapshot_task.cancel()
 
         shelve_take_member_snapshot(members_as_ids)
+
+    def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id in shelve_get_instructors():
+            return True
+        elif self.client.is_owner(interaction.user):
+            return True
+        return False
 
     def cog_unload(self) -> None:
         self.voice_channel = 0
@@ -230,33 +255,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
                 "Sorry, you have to be an instructor to use this command.",
                 ephemeral=True,
             )
-
-    # Shelve operations
-    def shelve_get_instructors() -> list[int]:
-        with shelve.open("database") as handle:
-            return handle["instructors"] if "instructors" in handle else []
-
-    def shelve_add_instructor(self, user_id: discord.Member.id) -> bool:
-        if user_id in self.shelve_get_instructors():
-            return False
-
-        with shelve.open("database") as handle:
-            temp_instructors: list[int] = handle["instructors"]
-            temp_instructors.append(user_id)
-            handle["instructors"] = temp_instructors
-
-        return user_id in self.shelve_get_instructors()
-
-    def shelve_remove_instructor(self, user_id: discord.Member.id) -> bool:
-        if not user_id in self.shelve_get_instructors():
-            return False
-
-        with shelve.open("database") as handle:
-            temp_instructors: list[int] = handle["instructors"]
-            temp_instructors.remove(user_id)
-            handle["instructors"] = temp_instructors
-
-        return not user_id in self.shelve_get_instructors()
 
 
 async def setup(client: commands.Bot) -> None:
