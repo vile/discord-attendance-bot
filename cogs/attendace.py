@@ -5,7 +5,7 @@ from discord import Interaction, app_commands
 from discord.ext import commands, tasks
 
 
-""" Shelver operations """  # fmt: skip
+""" Shelve operations """  # fmt: skip
 def shelve_get_instructors() -> list[int]:
     with shelve.open("database") as handle:
         return handle["instructors"] if "instructors" in handle else []
@@ -44,7 +44,10 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
 
 
 @app_commands.guild_only()
-class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
+class AttendanceCommandsCog(
+    commands.GroupCog,
+    name="attendance",
+):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
         self.voice_channel = 0
