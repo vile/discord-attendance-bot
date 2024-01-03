@@ -43,6 +43,7 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
         handle["snapshots"] = temp_snapshots
 
 
+@app_commands.guild_only()
 class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
