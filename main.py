@@ -39,6 +39,17 @@ async def main() -> None:
         if "instructors" not in handle:
             handle["instructors"] = []
 
+        # Always reset snapshots when bot is restarted
+        handle["snapshots"] = []
+
+        """
+        instructors: list[int]
+        - list of ints (user ids) that are later used to retrieve full discord.User objects
+
+        snapshots: list[int]
+        - list of ints (user ids) that were in the VC (in attendance) when the snapshot was taken
+        """
+
     client = AttendanceBot()
     async with client:
         await client.load_extensions()

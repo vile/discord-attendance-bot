@@ -34,6 +34,14 @@ def shelve_remove_instructor(user_id: discord.Member.id) -> bool:
     return not user_id in shelve_get_instructors()
 
 
+def shelve_take_member_snapshot(member_ids: list[int]) -> None:
+    with shelve.open("database") as handle:
+        temp_snapshots: list[dict] = handle["snapshots"]
+        snapshot: list[int] = member_ids
+        temp_snapshots.append(snapshot)
+        handle["snapshots"] = temp_snapshots
+
+
 # Checks
 def only_instructor_or_owner():
     def predicate(interaction: discord.Interaction) -> bool:
@@ -48,7 +56,8 @@ def only_instructor_or_owner():
 class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
-        self.session_id = ""
+        self.voice_channel = 0
+        self.attendance_threshold = 0.5  # 50% percent
         super().__init__()
 
     @commands.Cog.listener()
@@ -101,30 +110,175 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
 
     @app_commands.command()
     @only_instructor_or_owner()
-    async def start_session(self, interaction: discord.Interaction) -> None:
-        ...
+    async def start_session(
+        self, interaction: discord.Interaction, channel: discord.VoiceChannel
+    ) -> None:
+        # Check if snapshot_task loop is running
+        # If so, refuse to create another session, return
+
+        if self.snapshot_task.is_running():
+            await interaction.response.send_message(
+                f"A session is already running in {self.client.get_channel(self.voice_channel).mention}. If you want to start a new session use `/{self.__cog_name__} start_session`",
+                ephemeral=True,
+            )
+            return
+
+        # Check that an instructor is in the target `channel`
+        # If not, refuse to create session, return
+
+        vc_members: list[int] = list(map(lambda member: member.id, channel.members))  # fmt: skip
+        instructors: list[int] = shelve_get_instructors()
+        print(f"{vc_members=} {instructors=}")
+        valid_instructor_in_channel: bool = False
+        for instructor in instructors:
+            if instructor in vc_members:
+                valid_instructor_in_channel = True
+                break
+
+        print(f"{valid_instructor_in_channel=}")
+        if not valid_instructor_in_channel:
+            await interaction.response.send_message(
+                f"You or another instructor needs to be in {channel.mention} to start a session",
+                ephemeral=True,
+            )
+            return
+
+        # Set self.voice_channel
+        self.voice_channel = channel.id
+
+        # Start snapshot_task
+        self.snapshot_task.start()
+
+        await interaction.response.send_message(
+            f"Started a session in {channel.mention}!",
+            ephemeral=True,
+        )
 
     @app_commands.command()
     @only_instructor_or_owner()
-    async def stop_session(
-        self, interaction: discord.Interaction, session_id: str
-    ) -> None:
-        ...
+    async def stop_session(self, interaction: discord.Interaction) -> None:
+        # Check if task is already being canceled
+        # If so, notify user it is already being canceled, return
+        if self.snapshot_task.is_being_cancelled():
+            await interaction.response.send_message(
+                "This session is already being canceled, please wait",
+                ephemeral=True,
+            )
+            return
 
-    @tasks.loop(time=...)
+        # Check if snapshot_task loop is running
+        # If not, notify user that there is no session to stop, return
+        if not self.snapshot_task.is_running():
+            await interaction.response.send_message(
+                "There is no currently running session, so there is nothing to stop",
+                ephemeral=True,
+            )
+            return
+
+        # Clear self.voice_channel
+        self.voice_channel = 0
+
+        # Cancel snapshot_task
+        self.snapshot_task.cancel()
+
+        await interaction.response.send_message(
+            "Stopped session",
+            ephemeral=True,
+        )
+
+    @app_commands.command()
+    @only_instructor_or_owner()
+    async def get_attendance(self, interaction: discord.Interaction) -> None:
+        if self.snapshot_task.is_running():
+            await interaction.response.send_message(
+                "Can't report attendance while a session is active",
+                ephemeral=True,
+            )
+            return
+
+        with shelve.open("database") as handle:
+            snapshots: list[int] = handle["snapshots"]
+
+        if len(snapshots) == 0:
+            await interaction.response.send_message(
+                "No attendance to report",
+                ephemeral=True,
+            )
+            return
+
+        # Calculate how many times each int (user id) was in a snapshot
+        attendance_total: dict = {}
+        for snapshot in snapshots:
+            for member in snapshot:
+                if member in attendance_total:
+                    attendance_total[member] += 1
+                else:
+                    attendance_total[member] = 1
+
+        # Check to see if the attendance threshold was met (in reference to attendance_total per user)
+        num_snapshots: int = len(snapshots)
+        attendance_met: dict = {}
+        for member, attendance_count in attendance_total.items():
+            if attendance_count / num_snapshots >= self.attendance_threshold:
+                attendance_met[member] = True
+            else:
+                attendance_met[member] = False
+
+        message: str = f"Attendance for your recent session:\n- Total attended: {len(attendance_met.keys())}\n\nStatus:\n"
+        for member, did_attend in attendance_met.items():
+            pre_format: str = f"- <@{member}> "
+            if did_attend:
+                message += f"{pre_format} ✅ **ATTENDED**\n"
+            else:
+                message += f"{pre_format} ❌ **ABSENT**\n"
+
+        await interaction.response.send_message(message)
+
+    @app_commands.command()
+    @only_instructor_or_owner()
+    async def clear_attendance(self, interaction: discord.Interaction) -> None:
+        with shelve.open("database") as handle:
+            handle["snapshots"] = []
+
+        await interaction.response.send_message(
+            "Cleared attendance",
+            ephemeral=True,
+        )
+
+    @tasks.loop(seconds=3)
+    # @tasks.loop(minutes=15)
     async def snapshot_task(self) -> None:
-        ...
+        if self.snapshot_task.is_being_cancelled():
+            print("preventing task while being canceled")
+            return
 
-    @snapshot_task.before_loop
-    async def before_snapshot_task(self) -> None:
-        ...
+        print("taking snapshot")
 
-    @snapshot_task.after_loop
-    async def after_snapshot_task(self) -> None:
-        ...
+        # Make sure an instructor is in the designated VC
+        # If not, cancel snapshot_task
+        try:
+            target_vc_memberlist: list[discord.Member] = self.client.get_channel(self.voice_channel).members  # fmt: skip
+        except AttributeError:
+            print("couldnt get members list")
+            return
+        members_as_ids: list[int] = list(map(lambda member: member.id, target_vc_memberlist))  # fmt: skip
+        instructors: list[int] = shelve_get_instructors()
+        valid_instructor_in_channel: bool = False
+        for instructor in instructors:
+            if instructor in members_as_ids:
+                valid_instructor_in_channel = True
+                break
+
+        if not valid_instructor_in_channel:
+            print("instructor no longer in target vc")
+            self.snapshot_task.cancel()
+
+        # Save member list to shelve
+        shelve_take_member_snapshot(members_as_ids)
 
     def cog_unload(self) -> None:
-        self.snapshot_task.cancel()
+        self.voice_channel = 0
+        self.snapshot_task.stop()
 
     async def cog_app_command_error(
         self, interaction: discord.Interaction, error: commands.CommandError
