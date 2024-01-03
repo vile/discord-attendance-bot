@@ -1,4 +1,3 @@
-import logging
 import shelve
 
 import discord
@@ -64,7 +63,7 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        logging.info(f"{self.__cog_name__} cog loaded")
+        print(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
 
     @app_commands.command()
@@ -124,14 +123,12 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
 
         vc_members: list[int] = list(map(lambda member: member.id, channel.members))  # fmt: skip
         instructors: list[int] = shelve_get_instructors()
-        logging.debug(f"{vc_members=} {instructors=}")
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in vc_members:
                 valid_instructor_in_channel = True
                 break
 
-        logging.debug(f"{valid_instructor_in_channel=}")
         if not valid_instructor_in_channel:
             await interaction.response.send_message(
                 f"You or another instructor needs to be in {channel.mention} to start a session",
@@ -233,19 +230,11 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
     # @tasks.loop(minutes=15)
     async def snapshot_task(self) -> None:
         if self.snapshot_task.is_being_cancelled():
-            logging.info(
-                "Prevented additional task loop from executing while task was being canceled"
-            )
             return
-
-        logging.debug("Taking snapshot in snapshot_task")
 
         try:
             target_vc_memberlist: list[discord.Member] = self.client.get_channel(self.voice_channel).members  # fmt: skip
         except AttributeError:
-            logging.warning(
-                "Failed to get target VC members list. Task was most likely canceled between snapshots"
-            )
             return
         members_as_ids: list[int] = list(map(lambda member: member.id, target_vc_memberlist))  # fmt: skip
         instructors: list[int] = shelve_get_instructors()
@@ -256,9 +245,6 @@ class AttendanceCommandsCog(commands.GroupCog, name="attendance"):
                 break
 
         if not valid_instructor_in_channel:
-            logging.info(
-                "Canceling task, instructor not in target VC for current snapshot"
-            )
             self.snapshot_task.cancel()
 
         shelve_take_member_snapshot(members_as_ids)
