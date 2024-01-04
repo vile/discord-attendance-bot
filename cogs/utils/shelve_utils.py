@@ -1,4 +1,5 @@
 import shelve
+
 from discord import Member
 
 
@@ -37,6 +38,20 @@ def take_member_snapshot(member_ids: list[int]) -> None:
         snapshot: list[int] = member_ids
         temp_snapshots.append(snapshot)
         handle["snapshots"] = temp_snapshots
+
+
+def get_snapshots() -> list[int]:
+    with shelve.open("database") as handle:
+        snapshots: list[int] = handle["snapshots"]
+
+    return snapshots or []
+
+
+def clear_snapshots() -> bool:
+    with shelve.open("database") as handle:
+        handle["snapshots"] = []
+
+    return get_snapshots() == []
 
 
 def get_attendance_rate() -> float:

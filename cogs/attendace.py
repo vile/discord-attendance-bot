@@ -1,9 +1,8 @@
-import shelve
-
 import discord
-import cogs.utils.shelve_utils as shelve_utils
 from discord import app_commands
 from discord.ext import commands, tasks
+
+import cogs.utils.shelve_utils as shelve_utils
 
 
 @app_commands.guild_only()
@@ -134,8 +133,7 @@ class AttendanceCommandsCog(
             )
             return
 
-        with shelve.open("database") as handle:
-            snapshots: list[int] = handle["snapshots"]
+        snapshots: list[int] = shelve_utils.get_snapshots()
 
         if len(snapshots) == 0:
             await interaction.response.send_message(
@@ -172,8 +170,13 @@ class AttendanceCommandsCog(
 
     @app_commands.command()
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
-        with shelve.open("database") as handle:
-            handle["snapshots"] = []
+        success: bool = shelve_utils.clear_snapshots()
+        if not success:
+            await interaction.response.send_message(
+                "Seems I couldn't clear the current attendance. Try again",
+                ephemeral=True,
+            )
+            return
 
         await interaction.response.send_message(
             "Cleared attendance",
