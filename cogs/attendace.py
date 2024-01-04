@@ -285,6 +285,13 @@ class AttendanceCommandsCog(
     async def set_snapshot_interval(
         self, interaction: discord.Interaction, interval: app_commands.Range[int, 3, 15]
     ) -> None:
+        if self.snapshot_task.is_running() or self.snapshot_task.is_being_cancelled():
+            await interaction.response.send_message(
+                "You can't set the snapshot interval while a session is running or being canceled. Stop your current session or wait a few seconds for the current session to finish canceling",
+                ephemeral=True,
+            )
+            return
+
         success: bool = shelve_set_snapshot_interval(interval)
 
         if not success:
