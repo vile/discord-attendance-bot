@@ -45,7 +45,7 @@ def shelve_take_member_snapshot(member_ids: list[int]) -> None:
 
 def shelve_get_attendance_rate() -> float:
     with shelve.open("database") as handle:
-        attendance_rate = handle["minimum_attendance_rate"]
+        attendance_rate: float = handle["minimum_attendance_rate"]
 
     return attendance_rate
 
@@ -55,6 +55,20 @@ def shelve_set_attendace_rate(rate: float) -> bool:
         handle["minimum_attendance_rate"] = rate
 
     return rate == shelve_get_attendance_rate()
+
+
+def shelve_get_snapshot_interval() -> int:
+    with shelve.open("database") as handle:
+        snapshot_interval: int = handle["snapshot_interval"]
+
+    return snapshot_interval
+
+
+def shelve_set_snapshot_interval(interval: int) -> bool:
+    with shelve.open("database") as handle:
+        handle["snapshot_interval"] = interval
+
+    return interval == shelve_get_snapshot_interval()
 
 
 @app_commands.guild_only()
@@ -255,6 +269,33 @@ class AttendanceCommandsCog(
 
         await interaction.response.send_message(
             f"Successfully set the required attendance rate to {rate * 100:.0f}%",
+            ephemeral=True,
+        )
+
+    @app_commands.command()
+    async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
+        snapshot_interval: int = shelve_get_snapshot_interval()
+
+        await interaction.response.send_message(
+            f"The current snapshot rate is {snapshot_interval} seconds",
+            ephemeral=True,
+        )
+
+    @app_commands.command()
+    async def set_snapshot_interval(
+        self, interaction: discord.Interaction, interval: app_commands.Range[int, 3, 15]
+    ) -> None:
+        success: bool = shelve_set_snapshot_interval(interval)
+
+        if not success:
+            await interaction.response.send_message(
+                "There seems to have been an issue setting the snapshot interval. Try again",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.send_message(
+            f"Successfully set the snapshot interval to {interval} seconds",
             ephemeral=True,
         )
 
