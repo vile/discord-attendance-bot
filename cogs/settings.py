@@ -21,7 +21,7 @@ class SettingCommandsCog(
         print(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
 
-    @app_commands.command()
+    @app_commands.command(name="get-attendance", description="Get the current minimum attendance rate")  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
 
@@ -30,7 +30,8 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command()
+    @app_commands.command(name="set-attendance", description="Set the minimum attendance rate")  # fmt: skip
+    @app_commands.describe(rate="The minimum number, in percentage (0.1 = 10%), of snapshots a user needs to be present in to be counted as in attendance")  # fmt: skip
     async def set_minimum_attendance(
         self,
         interaction: discord.Interaction,
@@ -50,7 +51,7 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command()
+    @app_commands.command(name="get-interval", description="Get the current snapshot interval")  # fmt: skip
     async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
         snapshot_interval: int = shelve_utils.get_snapshot_interval()
 
@@ -59,9 +60,12 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command()
+    @app_commands.command(name="set-interval", description="Set the snapshot interval")  # fmt: skip
+    @app_commands.describe(interval="The time interval, in seconds, a snapshot should be taken of the members lists in the session VC")  # fmt: skip
     async def set_snapshot_interval(
-        self, interaction: discord.Interaction, interval: app_commands.Range[int, 3, 15]
+        self,
+        interaction: discord.Interaction,
+        interval: app_commands.Range[int, 3, 900],
     ) -> None:
         attendance_cog: commands.GroupCog = self.client.get_cog("attendance")
         snapshot_task: tasks.Loop = attendance_cog.snapshot_task

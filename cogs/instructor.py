@@ -21,7 +21,8 @@ class InstructorCommandsCog(
         print(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
 
-    @app_commands.command(name="add")
+    @app_commands.command(name="add", description="Add a user to the instructor whitelist")  # fmt: skip
+    @app_commands.describe(member="Non-instructor user to add to the instructor whitelist")  # fmt: skip
     async def add_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
@@ -38,7 +39,8 @@ class InstructorCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="remove")
+    @app_commands.command(name="remove", description="Remove an existing instructor from the instructor whitelist")  # fmt: skip
+    @app_commands.describe(member="Existing instructor user to remove from the instructor whitelist")  # fmt: skip
     async def remove_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
@@ -55,7 +57,7 @@ class InstructorCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="show")
+    @app_commands.command(name="show", description="Show the current list of users on the instructor whitelist")  # fmt: skip
     async def show_instructors(self, interaction: discord.Interaction) -> None:
         list_of_instructors: list[int] = shelve_utils.get_instructors()
         formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip

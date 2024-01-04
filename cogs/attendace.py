@@ -22,7 +22,8 @@ class AttendanceCommandsCog(
         print(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
 
-    @app_commands.command()
+    @app_commands.command(name="start", description="Start an attendance session, an instructor must be present in the VC at all times")  # fmt: skip
+    @app_commands.describe(channel="The VC to start taking attendance in")
     async def start_session(
         self, interaction: discord.Interaction, channel: discord.VoiceChannel
     ) -> None:
@@ -58,7 +59,7 @@ class AttendanceCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command()
+    @app_commands.command(name="stop", description="Stop the active attendance session")  # fmt: skip
     async def stop_session(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_being_cancelled():
             await interaction.response.send_message(
@@ -82,7 +83,7 @@ class AttendanceCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command()
+    @app_commands.command(name="get", description="Get an attendance report for your last active session")  # fmt: skip
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
@@ -126,7 +127,7 @@ class AttendanceCommandsCog(
 
         await interaction.response.send_message(message)
 
-    @app_commands.command()
+    @app_commands.command(name="clear", description="Permanently delete all snapshots from the last active attendance session")  # fmt: skip
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
         success: bool = shelve_utils.clear_snapshots()
         if not success:
