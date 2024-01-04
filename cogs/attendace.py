@@ -328,12 +328,13 @@ class AttendanceCommandsCog(
         if not valid_instructor_in_channel:
             self.snapshot_task.cancel()
 
+        print(f"taking member snapshot #{self.snapshot_task.current_loop}")
         shelve_take_member_snapshot(members_as_ids)
 
-    def interaction_check(self, interaction: discord.Interaction) -> bool:
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id in shelve_get_instructors():
             return True
-        elif self.client.is_owner(interaction.user):
+        elif await self.client.is_owner(interaction.user):
             return True
         return False
 
