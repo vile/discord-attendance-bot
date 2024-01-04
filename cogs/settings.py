@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 import cogs.utils.interaction_checks as interaction_checks
 import cogs.utils.shelve_utils as shelve_utils
@@ -63,7 +63,10 @@ class SettingCommandsCog(
     async def set_snapshot_interval(
         self, interaction: discord.Interaction, interval: app_commands.Range[int, 3, 15]
     ) -> None:
-        if self.snapshot_task.is_running() or self.snapshot_task.is_being_cancelled():
+        attendance_cog: commands.GroupCog = self.client.get_cog("attendance")
+        snapshot_task: tasks.Loop = attendance_cog.snapshot_task
+
+        if snapshot_task.is_running() or snapshot_task.is_being_cancelled():
             await interaction.response.send_message(
                 "You can't set the snapshot interval while a session is running or being canceled. Stop your current session or wait a few seconds for the current session to finish canceling",
                 ephemeral=True,
