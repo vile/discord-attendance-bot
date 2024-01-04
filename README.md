@@ -1,11 +1,11 @@
 # Discord Attendance Bot
 
-![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fvile%2Fdiscord-attendance-bot%2Fmaster%2Fpyproject.toml)
-![Discord.py Package Version](https://img.shields.io/badge/discord.py-2.3.2-green)
+[![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fvile%2Fdiscord-attendance-bot%2Fmaster%2Fpyproject.toml)](https://www.python.org/)
+[![Discord.py Package Version](https://img.shields.io/badge/discord.py-2.3.2-green)](https://github.com/Rapptz/discord.py)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
-A simple Discord bot for taking and reporting attendance of users within a specific voice channel. 
+A simple Discord bot for taking and reporting attendance of users within a specific voice channel.
 
 Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
 
@@ -13,16 +13,36 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
 
 1. Git - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
    1. Check if you have Git installed with `git --version`
-2. Python (>=3.10.12) - [Install Python (Windows)](https://www.python.org/downloads/windows/)
+2. Python (>=3.10.12) - [Install Python (Windows)](https://www.python.org/downloads/windows/), [Install Python (Linux)](https://docs.python.org/3/using/unix.html)
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
 
 ## Usage
 
-### Creating a Discord Bot
+### Creating a Discord Bot (App)
 
-This repo assumes you have created an application through the [Discord Dev Portal](https://discord.com/developers/applications) and attached a bot to it before.
+#### Creating an application
+
+This repo assumes you understand how to create an application through the [Discord Dev Portal](https://discord.com/developers/applications) and attach a bot to it. **It is recommended to set the bot to private** (public bot: off), as the bot is designed to be self-hosted and only interact with a single guild (server).
+
+<details>
+<summary>Disable Public Bot</summary>
+
+![Disable your bot's Public Bot flag in the Discord Dev Portal](./images/1-disable-public-bot.jpg)
+
+</details>
+
+#### Invite the bot
+
+The bot requires no intents or specific permissions when inviting it. If the voice channel(s) you intend to use with the bot require a specific role or are otherwise private in some way, you need to grant an explicit `View Channel` permission to the bot for that voice channel. Otherwise, the bot is able to view all voice channels the `@everyone` role can view. To generate a bot invite link, go to your bot's application page in the [Discord Dev Portal](https://discord.com/developers/applications), then navigate to `OAuth2` -> `URL Generator`. Select the `Bot` scope; no bot permissions are required.
+
+<details>
+<summary>Invite Link Example</summary>
+
+![Discord bot invite link](./images/2-bot-invite-link.jpg)
+
+</details>
 
 ### Installing
 
@@ -39,7 +59,7 @@ cd discord-attendance-bot
 mv .env.example .env
 ```
 
-You should put your Discord bot token in this .env file now
+Put your bot's token in .env as `DISCORD_BOT_TOKEN`.
 
 #### Create venv
 
