@@ -1,4 +1,4 @@
 [project]
 name = "discord-attendance-bot"
 version = "1.0.0"
-requires-python = "3.10.12"
+requires-python = ">=3.10.12"
