@@ -1,74 +1,9 @@
 import shelve
 
 import discord
+import cogs.utils.shelve_utils as shelve_utils
 from discord import app_commands
 from discord.ext import commands, tasks
-
-
-""" Shelve operations """  # fmt: skip
-def shelve_get_instructors() -> list[int]:
-    with shelve.open("database") as handle:
-        return handle["instructors"] if "instructors" in handle else []
-
-
-def shelve_add_instructor(user_id: discord.Member.id) -> bool:
-    if user_id in shelve_get_instructors():
-        return False
-
-    with shelve.open("database") as handle:
-        temp_instructors: list[int] = handle["instructors"]
-        temp_instructors.append(user_id)
-        handle["instructors"] = temp_instructors
-
-    return user_id in shelve_get_instructors()
-
-
-def shelve_remove_instructor(user_id: discord.Member.id) -> bool:
-    if not user_id in shelve_get_instructors():
-        return False
-
-    with shelve.open("database") as handle:
-        temp_instructors: list[int] = handle["instructors"]
-        temp_instructors.remove(user_id)
-        handle["instructors"] = temp_instructors
-
-    return not user_id in shelve_get_instructors()
-
-
-def shelve_take_member_snapshot(member_ids: list[int]) -> None:
-    with shelve.open("database") as handle:
-        temp_snapshots: list[dict] = handle["snapshots"]
-        snapshot: list[int] = member_ids
-        temp_snapshots.append(snapshot)
-        handle["snapshots"] = temp_snapshots
-
-
-def shelve_get_attendance_rate() -> float:
-    with shelve.open("database") as handle:
-        attendance_rate: float = handle["minimum_attendance_rate"]
-
-    return attendance_rate
-
-
-def shelve_set_attendace_rate(rate: float) -> bool:
-    with shelve.open("database") as handle:
-        handle["minimum_attendance_rate"] = rate
-
-    return rate == shelve_get_attendance_rate()
-
-
-def shelve_get_snapshot_interval() -> int:
-    with shelve.open("database") as handle:
-        snapshot_interval: int = handle["snapshot_interval"]
-
-    return snapshot_interval
-
-
-def shelve_set_snapshot_interval(interval: int) -> bool:
-    with shelve.open("database") as handle:
-        handle["snapshot_interval"] = interval
-
-    return interval == shelve_get_snapshot_interval()
 
 
 @app_commands.guild_only()
@@ -91,7 +26,7 @@ class AttendanceCommandsCog(
     async def add_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
-        success: bool = shelve_add_instructor(member.id)
+        success: bool = shelve_utils.add_instructor(member.id)
         if not success:
             await interaction.response.send_message(
                 "Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
@@ -108,7 +43,7 @@ class AttendanceCommandsCog(
     async def remove_instructor(
         self, interaction: discord.Interaction, member: discord.Member
     ) -> None:
-        success: bool = shelve_remove_instructor(member.id)
+        success: bool = shelve_utils.remove_instructor(member.id)
         if not success:
             await interaction.response.send_message(
                 "I couldn't remove this member. Are you sure they're an existing instructor?",
@@ -123,7 +58,7 @@ class AttendanceCommandsCog(
 
     @app_commands.command()
     async def show_instructors(self, interaction: discord.Interaction) -> None:
-        list_of_instructors: list[int] = shelve_get_instructors()
+        list_of_instructors: list[int] = shelve_utils.get_instructors()
         formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip
         if formatted_message == "":
             formatted_message = "There are no instructors to show!"
@@ -142,7 +77,7 @@ class AttendanceCommandsCog(
             return
 
         vc_members: list[int] = list(map(lambda member: member.id, channel.members))  # fmt: skip
-        instructors: list[int] = shelve_get_instructors()
+        instructors: list[int] = shelve_utils.get_instructors()
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in vc_members:
@@ -156,7 +91,7 @@ class AttendanceCommandsCog(
             )
             return
 
-        task_interval: int = shelve_get_snapshot_interval()
+        task_interval: int = shelve_utils.get_snapshot_interval()
         self.voice_channel = channel.id
         self.snapshot_task.change_interval(seconds=task_interval)
         self.snapshot_task.start()
@@ -220,7 +155,7 @@ class AttendanceCommandsCog(
         num_snapshots: int = len(snapshots)
         attendance_met: dict = {}
         for member, attendance_count in attendance_total.items():
-            if attendance_count / num_snapshots >= shelve_get_attendance_rate():
+            if attendance_count / num_snapshots >= shelve_utils.get_attendance_rate():
                 attendance_met[member] = True
             else:
                 attendance_met[member] = False
@@ -247,7 +182,7 @@ class AttendanceCommandsCog(
 
     @app_commands.command()
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
-        attendance_rate: float = shelve_get_attendance_rate()
+        attendance_rate: float = shelve_utils.get_attendance_rate()
 
         await interaction.response.send_message(
             f"The current minimum attendance rate is {attendance_rate * 100:.0f}%",
@@ -260,7 +195,7 @@ class AttendanceCommandsCog(
         interaction: discord.Interaction,
         rate: app_commands.Range[float, 0.0, 1.0],
     ) -> None:
-        success: bool = shelve_set_attendace_rate(rate)
+        success: bool = shelve_utils.set_attendace_rate(rate)
 
         if not success:
             await interaction.response.send_message(
@@ -276,7 +211,7 @@ class AttendanceCommandsCog(
 
     @app_commands.command()
     async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
-        snapshot_interval: int = shelve_get_snapshot_interval()
+        snapshot_interval: int = shelve_utils.get_snapshot_interval()
 
         await interaction.response.send_message(
             f"The current snapshot rate is {snapshot_interval} seconds",
@@ -294,7 +229,7 @@ class AttendanceCommandsCog(
             )
             return
 
-        success: bool = shelve_set_snapshot_interval(interval)
+        success: bool = shelve_utils.set_snapshot_interval(interval)
 
         if not success:
             await interaction.response.send_message(
@@ -318,7 +253,7 @@ class AttendanceCommandsCog(
         except AttributeError:
             return
         members_as_ids: list[int] = list(map(lambda member: member.id, target_vc_memberlist))  # fmt: skip
-        instructors: list[int] = shelve_get_instructors()
+        instructors: list[int] = shelve_utils.get_instructors()
         valid_instructor_in_channel: bool = False
         for instructor in instructors:
             if instructor in members_as_ids:
@@ -329,10 +264,10 @@ class AttendanceCommandsCog(
             self.snapshot_task.cancel()
 
         print(f"taking member snapshot #{self.snapshot_task.current_loop}")
-        shelve_take_member_snapshot(members_as_ids)
+        shelve_utils.take_member_snapshot(members_as_ids)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id in shelve_get_instructors():
+        if interaction.user.id in shelve_utils.get_instructors():
             return True
         elif await self.client.is_owner(interaction.user):
             return True
