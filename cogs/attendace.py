@@ -165,7 +165,9 @@ class AttendanceCommandsCog(
         shelve_utils.take_member_snapshot(members_as_ids)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction_checks.user_is_instructor_or_owner(self.client, interaction):
+        if await interaction_checks.user_is_instructor_or_owner(
+            self.client, interaction
+        ):
             return True
         return False
 

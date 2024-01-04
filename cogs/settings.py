@@ -11,6 +11,16 @@ class SettingCommandsCog(
     commands.GroupCog,
     name="settings",
 ):
+    def __init__(self, client: commands.Bot) -> None:
+        self.client = client
+
+        super().__init__()
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        print(f"{self.__cog_name__} cog loaded")
+        await self.client.tree.sync()
+
     @app_commands.command()
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
@@ -75,7 +85,9 @@ class SettingCommandsCog(
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction_checks.user_is_instructor_or_owner(self.client, interaction):
+        if await interaction_checks.user_is_instructor_or_owner(
+            self.client, interaction
+        ):
             return True
         return False
 
