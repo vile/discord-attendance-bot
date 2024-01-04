@@ -156,11 +156,13 @@ class AttendanceCommandsCog(
             )
             return
 
+        task_interval: int = shelve_get_snapshot_interval()
         self.voice_channel = channel.id
+        self.snapshot_task.change_interval(seconds=task_interval)
         self.snapshot_task.start()
 
         await interaction.response.send_message(
-            f"Started a session in {channel.mention}!",
+            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds!",
             ephemeral=True,
         )
 
@@ -306,9 +308,7 @@ class AttendanceCommandsCog(
             ephemeral=True,
         )
 
-    # TODO: Dynamically get task loop time (and set/get using shelve)
-    @tasks.loop(seconds=3)
-    # @tasks.loop(minutes=15)
+    @tasks.loop()
     async def snapshot_task(self) -> None:
         if self.snapshot_task.is_being_cancelled():
             return
