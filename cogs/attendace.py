@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import cogs.utils.interaction_checks as interaction_checks
 import cogs.utils.shelve_utils as shelve_utils
 
 
@@ -20,49 +21,6 @@ class AttendanceCommandsCog(
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
         await self.client.tree.sync()
-
-    @app_commands.command()
-    async def add_instructor(
-        self, interaction: discord.Interaction, member: discord.Member
-    ) -> None:
-        success: bool = shelve_utils.add_instructor(member.id)
-        if not success:
-            await interaction.response.send_message(
-                "Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
-                ephemeral=True,
-            )
-            return
-
-        await interaction.response.send_message(
-            f"Successfully added {member.mention} as an instructor!",
-            ephemeral=True,
-        )
-
-    @app_commands.command()
-    async def remove_instructor(
-        self, interaction: discord.Interaction, member: discord.Member
-    ) -> None:
-        success: bool = shelve_utils.remove_instructor(member.id)
-        if not success:
-            await interaction.response.send_message(
-                "I couldn't remove this member. Are you sure they're an existing instructor?",
-                ephemeral=True,
-            )
-            return
-
-        await interaction.response.send_message(
-            f"Successfully removed  {member.mention} as an instructor!",
-            ephemeral=True,
-        )
-
-    @app_commands.command()
-    async def show_instructors(self, interaction: discord.Interaction) -> None:
-        list_of_instructors: list[int] = shelve_utils.get_instructors()
-        formatted_message: str = ", ".join(f"<@{instructor}>" for instructor in list_of_instructors)  # fmt: skip
-        if formatted_message == "":
-            formatted_message = "There are no instructors to show!"
-
-        await interaction.response.send_message(formatted_message, ephemeral=True)
 
     @app_commands.command()
     async def start_session(
@@ -270,9 +228,7 @@ class AttendanceCommandsCog(
         shelve_utils.take_member_snapshot(members_as_ids)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id in shelve_utils.get_instructors():
-            return True
-        elif await self.client.is_owner(interaction.user):
+        if interaction_checks.user_is_instructor_or_owner(self.client, interaction):
             return True
         return False
 
