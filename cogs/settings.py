@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -19,7 +21,6 @@ class SettingCommandsCog(
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
-        await self.client.tree.sync()
 
     @app_commands.command(name="get-attendance", description="Get the current minimum attendance rate")  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
@@ -109,4 +110,6 @@ class SettingCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(SettingCommandsCog(client))
+    await client.add_cog(
+        SettingCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
+    )

@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -20,7 +22,6 @@ class AttendanceCommandsCog(
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
-        await self.client.tree.sync()
 
     @app_commands.command(name="start", description="Start an attendance session, an instructor must be present in the VC at all times")  # fmt: skip
     @app_commands.describe(channel="The VC to start taking attendance in")
@@ -187,4 +188,6 @@ class AttendanceCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(AttendanceCommandsCog(client))
+    await client.add_cog(
+        AttendanceCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
+    )

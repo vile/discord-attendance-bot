@@ -3,7 +3,6 @@ import os
 import shelve
 
 import discord
-import nest_asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -22,14 +21,12 @@ class AttendanceBot(commands.Bot):
 
         self.remove_command("help")
 
-    async def load_extensions(self) -> None:
+    async def setup_hook(self) -> None:
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
                 await self.load_extension(f"cogs.{filename[:-3]}")
 
-    async def run(self) -> None:
-        await super().run(os.getenv("DISCORD_BOT_TOKEN"))
-        await super().tree.sync()
+        await self.tree.sync()
 
 
 async def main() -> None:
@@ -59,10 +56,9 @@ async def main() -> None:
 
     client = AttendanceBot()
     async with client:
-        await client.load_extensions()
-        await client.run()
+        await client.start(os.getenv("DISCORD_BOT_TOKEN"))
 
 
 if __name__ == "__main__":
-    nest_asyncio.apply()
+    discord.utils.setup_logging()
     asyncio.run(main())

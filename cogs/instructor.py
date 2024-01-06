@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -19,7 +21,6 @@ class InstructorCommandsCog(
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
-        await self.client.tree.sync()
 
     @app_commands.command(name="add", description="Add a user to the instructor whitelist")  # fmt: skip
     @app_commands.describe(member="Non-instructor user to add to the instructor whitelist")  # fmt: skip
@@ -84,4 +85,6 @@ class InstructorCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(InstructorCommandsCog(client))
+    await client.add_cog(
+        InstructorCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
+    )
