@@ -65,6 +65,7 @@ mv .env.example .env
 ```
 
 Put your bot's token in .env as `DISCORD_BOT_TOKEN`.
+Put your guild's ID in .env as `GUILD_ID`.
 
 #### Create venv
 
