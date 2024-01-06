@@ -6,6 +6,8 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+import cogs.utils.constants as constants
+
 
 class AttendanceBot(commands.Bot):
     def __init__(self) -> None:
@@ -33,7 +35,7 @@ async def main() -> None:
     load_dotenv()
 
     # Set up simple persistence
-    with shelve.open("database") as handle:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
         if "instructors" not in handle:
             handle["instructors"] = []
 
