@@ -28,7 +28,7 @@ class SettingCommandsCog(
         attendance_rate: float = shelve_utils.get_attendance_rate()
 
         await interaction.response.send_message(
-            f"The current minimum attendance rate is {attendance_rate * 100:.0f}%",
+            f"The current minimum attendance rate is **{attendance_rate * 100:.0f}%**",
             ephemeral=True,
         )
 
@@ -49,7 +49,7 @@ class SettingCommandsCog(
             return
 
         await interaction.response.send_message(
-            f"Successfully set the required attendance rate to {rate * 100:.0f}%",
+            f"Successfully set the required attendance rate to **{rate * 100:.0f}%**",
             ephemeral=True,
         )
 
@@ -58,7 +58,7 @@ class SettingCommandsCog(
         snapshot_interval: int = shelve_utils.get_snapshot_interval()
 
         await interaction.response.send_message(
-            f"The current snapshot rate is {snapshot_interval} seconds",
+            f"The current snapshot rate is **{snapshot_interval} seconds**",
             ephemeral=True,
         )
 
@@ -89,7 +89,7 @@ class SettingCommandsCog(
             return
 
         await interaction.response.send_message(
-            f"Successfully set the snapshot interval to {interval} seconds",
+            f"Successfully set the snapshot interval to **{interval} seconds**",
             ephemeral=True,
         )
 

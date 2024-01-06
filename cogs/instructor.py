@@ -37,7 +37,7 @@ class InstructorCommandsCog(
             return
 
         await interaction.response.send_message(
-            f"Successfully added {member.mention} as an instructor!",
+            f"Successfully added {member.mention} as an instructor",
             ephemeral=True,
         )
 
@@ -55,7 +55,7 @@ class InstructorCommandsCog(
             return
 
         await interaction.response.send_message(
-            f"Successfully removed  {member.mention} as an instructor!",
+            f"Successfully removed  {member.mention} as an instructor",
             ephemeral=True,
         )
 

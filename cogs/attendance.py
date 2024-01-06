@@ -31,7 +31,7 @@ class AttendanceCommandsCog(
     ) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
-                f"A session is already running in {self.client.get_channel(self.voice_channel).mention}. If you want to start a new session use `/{self.__cog_name__} start_session`",
+                f"A session is already running in {self.client.get_channel(self.voice_channel).mention}",
                 ephemeral=True,
             )
             return
@@ -72,7 +72,7 @@ class AttendanceCommandsCog(
 
         if not self.snapshot_task.is_running():
             await interaction.response.send_message(
-                "There is no currently running session, so there is nothing to stop",
+                "A session is not currently running, so there is nothing to stop",
                 ephemeral=True,
             )
             return
@@ -81,7 +81,7 @@ class AttendanceCommandsCog(
         self.snapshot_task.cancel()
 
         await interaction.response.send_message(
-            "Stopped session",
+            "Successfully stopped the active session, no longer taking snapshots",
             ephemeral=True,
         )
 
@@ -89,7 +89,7 @@ class AttendanceCommandsCog(
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
-                "Can't report attendance while a session is active",
+                "Can't report attendance while a session is active. Stop the current session if you want to get a report",
                 ephemeral=True,
             )
             return
@@ -98,7 +98,7 @@ class AttendanceCommandsCog(
 
         if len(snapshots) == 0:
             await interaction.response.send_message(
-                "No attendance to report",
+                "No available stopshot data to report attendance with",
                 ephemeral=True,
             )
             return
@@ -119,7 +119,7 @@ class AttendanceCommandsCog(
             else:
                 attendance_met[member] = False
 
-        message: str = f"Attendance for your recent session:\n- Total attended: {len(attendance_met.keys())}\n\nStatus:\n"
+        message: str = f"Attendance for the recent attendance session:\n- Total Attended: {len(attendance_met.keys())}\n- Total Snapshots: {len(snapshots)}\n\nStatus:\n"
         for member, did_attend in attendance_met.items():
             pre_format: str = f"- <@{member}> "
             if did_attend:
@@ -134,13 +134,13 @@ class AttendanceCommandsCog(
         success: bool = shelve_utils.clear_snapshots()
         if not success:
             await interaction.response.send_message(
-                "Seems I couldn't clear the current attendance. Try again",
+                "Seems I couldn't clear attendance snapshots. Try again",
                 ephemeral=True,
             )
             return
 
         await interaction.response.send_message(
-            "Cleared attendance",
+            "Successfully cleared attendance snapshots",
             ephemeral=True,
         )
 
