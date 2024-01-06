@@ -29,6 +29,7 @@ This repo assumes you understand how to create an application through the [Disco
 
 <details>
 <summary>Disable Public Bot</summary>
+<br>
 
 ![Disable your bot's Public Bot flag in the Discord Dev Portal](./images/1-disable-public-bot.jpg)
 
@@ -44,6 +45,7 @@ Select the `Bot` scope; no bot permissions are required.
 
 <details>
 <summary>Invite Link Example</summary>
+<br>
 
 ![Discord bot invite link](./images/2-bot-invite-link.jpg)
 
