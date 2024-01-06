@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import cogs.utils.descriptions as descriptions
 import cogs.utils.interaction_checks as interaction_checks
 import cogs.utils.shelve_utils as shelve_utils
 
@@ -23,8 +24,8 @@ class AttendanceCommandsCog(
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
 
-    @app_commands.command(name="start", description="Start an attendance session, an instructor must be present in the VC at all times")  # fmt: skip
-    @app_commands.describe(channel="The VC to start taking attendance in")
+    @app_commands.command(name="start", description=descriptions.ATTENDANCE_START_SESSION)  # fmt: skip
+    @app_commands.describe(channel=descriptions.ATTENDANCE_START_SESSION_CHANNEL)  # fmt: skip
     async def start_session(
         self, interaction: discord.Interaction, channel: discord.VoiceChannel
     ) -> None:
@@ -60,7 +61,7 @@ class AttendanceCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="stop", description="Stop the active attendance session")  # fmt: skip
+    @app_commands.command(name="stop", description=descriptions.ATTENDANCE_STOP_SESSION)  # fmt: skip
     async def stop_session(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_being_cancelled():
             await interaction.response.send_message(
@@ -84,7 +85,7 @@ class AttendanceCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="get", description="Get an attendance report for your last active session")  # fmt: skip
+    @app_commands.command(name="get", description=descriptions.ATTENDANCE_GET_ATTENDANCE)  # fmt: skip
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
@@ -128,7 +129,7 @@ class AttendanceCommandsCog(
 
         await interaction.response.send_message(message)
 
-    @app_commands.command(name="clear", description="Permanently delete all snapshots from the last active attendance session")  # fmt: skip
+    @app_commands.command(name="clear", description=descriptions.ATTENDANCE_CLEAR_ATTENDANCE)  # fmt: skip
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
         success: bool = shelve_utils.clear_snapshots()
         if not success:

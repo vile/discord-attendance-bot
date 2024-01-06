@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import cogs.utils.descriptions as descriptions
 import cogs.utils.interaction_checks as interaction_checks
 import cogs.utils.shelve_utils as shelve_utils
 
@@ -22,7 +23,7 @@ class SettingCommandsCog(
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
 
-    @app_commands.command(name="get-attendance", description="Get the current minimum attendance rate")  # fmt: skip
+    @app_commands.command(name="get-attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
 
@@ -31,8 +32,8 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="set-attendance", description="Set the minimum attendance rate")  # fmt: skip
-    @app_commands.describe(rate="The minimum number, in percentage (0.1 = 10%), of snapshots a user needs to be present in to be counted as in attendance")  # fmt: skip
+    @app_commands.command(name="set-attendance", description=descriptions.SETTINGS_SET_MINIMUM_ATTENDANCE)  # fmt: skip
+    @app_commands.describe(rate=descriptions.SETTINGS_SET_MINIMUM_ATTENDANCE_RATE)  # fmt: skip
     async def set_minimum_attendance(
         self,
         interaction: discord.Interaction,
@@ -52,7 +53,7 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="get-interval", description="Get the current snapshot interval")  # fmt: skip
+    @app_commands.command(name="get-interval", description=descriptions.SETTINGS_GET_INTERVAL)  # fmt: skip
     async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
         snapshot_interval: int = shelve_utils.get_snapshot_interval()
 
@@ -61,8 +62,8 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="set-interval", description="Set the snapshot interval")  # fmt: skip
-    @app_commands.describe(interval="The time interval, in seconds, a snapshot should be taken of the members lists in the session VC")  # fmt: skip
+    @app_commands.command(name="set-interval", description=descriptions.SETTINGS_SET_INTERVAL)  # fmt: skip
+    @app_commands.describe(interval=descriptions.SETTINGS_SET_INTERVAL_INTERVAL)  # fmt: skip
     async def set_snapshot_interval(
         self,
         interaction: discord.Interaction,
