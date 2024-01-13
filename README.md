@@ -89,6 +89,8 @@ make start
 
 ## Commands
 
+All commands are restricted to users in the `Instructor` whitelist or the active bot owner. 
+
 ### Attendance
 
 | Command | Description                                                  | Usage                         |
