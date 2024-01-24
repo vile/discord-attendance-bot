@@ -87,36 +87,6 @@ make deps
 make start
 ```
 
-## Commands
-
-All commands are restricted to users in the `Instructor` whitelist or the active bot owner. 
-
-### Attendance
-
-| Command | Description                                                  | Usage                         |
-| ------- | ------------------------------------------------------------ | ----------------------------- |
-| start   | Start an attendance session                                  | /attendance start \[channel\] |
-| stop    | Stop the active attendance session                           | /attendance stop              |
-| get     | Get an attendance report for the last active session         | /attendance get               |
-| clear   | Permanently delete all activity from the last active session | /attendance clear             |
-
-### Instructor
-
-| Command | Description                                                 | Usage                         |
-| ------- | ----------------------------------------------------------- | ----------------------------- |
-| add     | Add a user to the instructor whitelist                      | /instructor add \[member\]    |
-| remove  | Remove an existing instructor from the instructor whitelist | /instructor remove \[member\] |
-| show    | Show the current list of users on the instructor whitelist  | /instructor show              |
-
-### Settings
-
-| Command        | Description                                  | Usage                               |
-| -------------- | -------------------------------------------- | ----------------------------------- |
-| get-attendance | Get the current minimum attendance rate      | /settings get-attendance            |
-| set-attendance | Set the minimum attendance rate (percentage) | /settings set-attendance \[rate\]   |
-| get-interval   | Get the current snapshot interval            | /settings get-interval              |
-| set-interval   | Set the snapshot interval (seconds)          | /settings set-interval \[interval\] |
-
 ## Known Limitations
 
 Since this bot is developed using [Python's shelve module](https://docs.python.org/3/library/shelve.html) for persistent data storage, there are some limitations intentionally imposed. 
