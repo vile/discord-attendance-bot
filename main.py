@@ -28,8 +28,6 @@ class AttendanceBot(commands.Bot):
             if filename.endswith(".py"):
                 await self.load_extension(f"cogs.{filename[:-3]}")
 
-        await self.tree.sync()
-
 
 async def main() -> None:
     load_dotenv()
