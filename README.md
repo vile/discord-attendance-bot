@@ -124,7 +124,6 @@ If application commands are not synced to the guild, the bot integration will sh
 ![This application has no commands](./images/5-application-has-no-commands.jpg)
 
 </details>
-<br>
 
 After the command tree has been synced, the bot no longer requires the `Send Messages` permission.
 
