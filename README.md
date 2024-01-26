@@ -37,17 +37,35 @@ This repo assumes you understand how to create an application through the [Disco
 
 #### Invite the bot
 
-The bot requires no intents or specific permissions when inviting it.
+The bot requires no intents or specific permissions when inviting it; `Send Messages` is only temporarily required during bot setup.
 If the voice channel(s) you intend to use with the bot require a specific role or are otherwise restricted in some way, you need to grant an explicit `View Channel` permission to the bot for that voice channel.
 Otherwise, the bot is able to view all voice channels the `@everyone` role can view.
 To generate a bot invite link, go to your bot's application page in the [Discord Dev Portal](https://discord.com/developers/applications), then navigate to `OAuth2` -> `URL Generator`.
-Select the `Bot` scope; no bot permissions are required.
+Select the `bot` and `applications.commands` scopes; no permissions are **required** (see suggested permissions below).
+
+<details>
+<summary>Required Scopes</summary>
+<br>
+
+![Discord bot invite link](./images/2-required-scopes.jpg)
+
+</details>
+
+<details>
+<summary>Suggested Permissions</summary>
+<br>
+
+![Discord bot invite link](./images/3-suggested-permissions.jpg)
+
+</details>
 
 <details>
 <summary>Invite Link Example</summary>
 <br>
 
-![Discord bot invite link](./images/2-bot-invite-link.jpg)
+![Discord bot invite link](./images/4-bot-invite-link.jpg)
+
+- `https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID&permissions=3072&scope=bot+applications.commands`
 
 </details>
 
@@ -87,10 +105,45 @@ make deps
 make start
 ```
 
+#### Sync Commands to Guild
+
+To make application commands available in the server, mention the bot to invoke the `sync` text command.
+Where `~` syncs all guild commands to the current guild (see: [command body](https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html#command-body), [archive](https://archive.ph/vsSFz)).
+Make sure the bot, temporarily, has `Send Messages` in the channel where you are mentioning the bot.
+
+```
+<@BOT_USER_ID> sync ~
+```
+
+If application commands are not synced to the guild, the bot integration will show that "this application has no commands," (rendering all commands unusable) and autocomplete will not work.
+
+<details>
+<summary>This application has no commands</summary>
+<br>
+
+![This application has no commands](./images/5-application-has-no-commands.jpg)
+
+</details>
+<br>
+
+After the command tree has been synced, the bot no longer requires the `Send Messages` permission.
+
+<details>
+<summary>Properly synced commands</summary>
+<br>
+
+![Properly synced commands](./images/6-properly-synced-commands.jpg)
+
+</details>
+
 ## Known Limitations
 
 Since this bot is developed using [Python's shelve module](https://docs.python.org/3/library/shelve.html) for persistent data storage, there are some limitations intentionally imposed. 
 Specifically, the retention of attendance session data (snapshots).
-Snapshot data is permanently cleared when using the `/attendance clear` command, as well as on bot restart.
+Snapshot data is permanently cleared when using the `/attendance clear` command, as well as on each bot start.
 As such, instructors using this bot should immediately export an attendance report using the `/attendance get` command.
 
+## Acknowledgements
+
+- The [discord.py Discord](https://discord.com/invite/r3sSKJJ) and mod team for my answering questions
+- [AbtractUmbra's](https://github.com/AbstractUmbra) open source command tree [syncing command](https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html) ([The Unlicense](https://unlicense.org/))
