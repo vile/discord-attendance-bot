@@ -10,6 +10,6 @@
 
 Please email any vulnerabilities to `observant_pennant964 [at] slmail [dot] me`.
 
-# Preferred Languages
+## Preferred Languages
 
 We prefer all communications to be in English.
