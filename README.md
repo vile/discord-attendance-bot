@@ -13,7 +13,7 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
 
 1. Git - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
    1. Check if you have Git installed with `git --version`
-2. Python (>=3.10) - [Install Python (Windows)](https://www.python.org/downloads/windows/), [Install Python (Linux)](https://docs.python.org/3/using/unix.html)
+2. Python (3.10) - [Install Python (Windows)](https://www.python.org/downloads/windows/), [Install Python (Linux)](https://docs.python.org/3/using/unix.html)
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
