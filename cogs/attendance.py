@@ -5,20 +5,18 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 import cogs.utils.descriptions as descriptions
-import cogs.utils.interaction_checks as interaction_checks
 import cogs.utils.shelve_utils as shelve_utils
+from cogs.base.common import CommonBaseCog
 
 
 @app_commands.guild_only()
 class AttendanceCommandsCog(
-    commands.GroupCog,
+    CommonBaseCog,
     name="attendance",
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
         self.voice_channel = 0
-
-        super().__init__()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -168,25 +166,9 @@ class AttendanceCommandsCog(
         print(f"taking member snapshot #{self.snapshot_task.current_loop}")
         shelve_utils.take_member_snapshot(members_as_ids)
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if await interaction_checks.user_is_instructor_or_owner(
-            self.client, interaction
-        ):
-            return True
-        return False
-
     def cog_unload(self) -> None:
         self.voice_channel = 0
         self.snapshot_task.stop()
-
-    async def cog_app_command_error(
-        self, interaction: discord.Interaction, error: commands.CommandError
-    ) -> None:
-        if isinstance(error, app_commands.CheckFailure):
-            await interaction.response.send_message(
-                "Sorry, you have to be an instructor to use this command.",
-                ephemeral=True,
-            )
 
 
 async def setup(client: commands.Bot) -> None:

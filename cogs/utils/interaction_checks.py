@@ -11,7 +11,7 @@ async def user_is_instructor(client: commands.Bot, interaction: Interaction) -> 
 
 
 async def user_is_owner(client: commands.Bot, interaction: Interaction) -> bool:
-    return client.is_owner(interaction.user)
+    return await client.is_owner(interaction.user)
 
 
 async def user_is_instructor_or_owner(

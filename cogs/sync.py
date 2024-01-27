@@ -13,8 +13,6 @@ class SyncComanndsCog(
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
 
-        super().__init__()
-
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         print(f"{self.__cog_name__} cog loaded")
