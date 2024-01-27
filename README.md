@@ -145,4 +145,4 @@ As such, instructors using this bot should immediately export an attendance repo
 ## Acknowledgements
 
 - The [discord.py Discord](https://discord.com/invite/r3sSKJJ) and mod team for my answering questions
-- [AbtractUmbra's](https://github.com/AbstractUmbra) open source command tree [syncing command](https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html) ([The Unlicense](https://unlicense.org/))
+- [AbstractUmbra's](https://github.com/AbstractUmbra) open source command tree [syncing command](https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html) ([The Unlicense](https://unlicense.org/))
