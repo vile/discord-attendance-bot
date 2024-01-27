@@ -113,8 +113,9 @@ class AttendanceCommandsCog(
 
         num_snapshots: int = len(snapshots)
         attendance_met: dict = {}
+        attendance_rate: float = shelve_utils.get_attendance_rate()
         for member, attendance_count in attendance_total.items():
-            if attendance_count / num_snapshots >= shelve_utils.get_attendance_rate():
+            if attendance_count / num_snapshots >= attendance_rate:
                 attendance_met[member] = True
             else:
                 attendance_met[member] = False
