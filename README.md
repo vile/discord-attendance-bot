@@ -17,6 +17,8 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
+4. Docker - [Install Docker](https://docs.docker.com/engine/install/) (Optionally)
+   1. Check if you have Docker installed with `docker --version`
 
 ## Usage
 
@@ -134,6 +136,34 @@ After the command tree has been synced, the bot no longer requires the `Send Mes
 ![Properly synced commands](./images/6-properly-synced-commands.jpg)
 
 </details>
+
+## Using the bot with Docker
+
+It might be necessary to prefix commands with `sudo` when using `docker compose` commands.
+[gorialis's](https://github.com/gorialis) discord.py [Docker base](https://hub.docker.com/r/gorialis/discord.py/) is used for this repo.
+Use the `.env` file as normal (include your `DISCORD_BOT_TOKEN` and `GUILD_ID`), it is included in the compose.
+
+### Compose up
+
+Compose the docker image from the `Dockerfile` and start the image.
+
+```bash
+docker compose up
+```
+
+### Compose down
+
+Stop the and/or delete the Docker image.
+
+```bash
+docker compose down
+```
+
+### View images
+
+```bash
+docker compose images
+```
 
 ## Known Limitations
 
