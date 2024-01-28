@@ -153,7 +153,7 @@ docker compose up
 
 ### Compose down
 
-Stop the and/or delete the Docker image.
+Stop the container and/or delete the Docker image.
 
 ```bash
 docker compose down
