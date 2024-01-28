@@ -151,6 +151,8 @@ Compose the docker image from the `Dockerfile` and start the image.
 docker compose up
 ```
 
+Stop the container (gracefully) with `CTRL+C`. To start the container again, use the same `up` command.
+
 ### Compose down
 
 Stop the container and/or delete the Docker image.
@@ -158,6 +160,8 @@ Stop the container and/or delete the Docker image.
 ```bash
 docker compose down
 ```
+
+Composing down will delete the current container and remove persistent data used by the bot, such as settings (snapshot interval, attendance rate) and snapshot data. However, due to the low setup complexity of the bot (and that snapshot data is cleared on each bot start anyways), using a volume to persist this data does not make sense for the small gain. 
 
 ### View images
 
