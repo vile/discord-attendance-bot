@@ -10,6 +10,7 @@
 
 # Docker
 docker-compose.yml
+compose.yaml
 Dockerfile
 .docker
 .dockerignore
