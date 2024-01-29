@@ -17,7 +17,7 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
-4. Poetry -[Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
+4. Poetry - [Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
    1. Check if you have Poetry installed with `poetry --version`
 5. Docker - [Install Docker](https://docs.docker.com/engine/install/) (Optionally)
    1. Check if you have Docker installed with `docker --version`
@@ -78,8 +78,7 @@ Select the `bot` and `applications.commands` scopes; no permissions are **requir
 #### Clone this repo
 
 ```bash
-git clone https://github.com/vile/discord-attendance-bot.git
-cd discord-attendance-bot
+git clone https://github.com/vile/discord-attendance-bot.git && cd discord-attendance-bot
 ```
 
 #### Rename example .env file
@@ -185,7 +184,7 @@ Composing down will delete the current container and remove persistent data used
 ### View running containers
 
 ```bash
-docker ps
+docker compose ps
 ```
 
 ### View images
