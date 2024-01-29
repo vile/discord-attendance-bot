@@ -149,25 +149,44 @@ It might be necessary to prefix commands with `sudo` when using `docker compose`
 [gorialis's](https://github.com/gorialis) discord.py [Docker base](https://hub.docker.com/r/gorialis/discord.py/) is used for this repo.
 Use the `.env` file as normal (include your `DISCORD_BOT_TOKEN` and `GUILD_ID`), it is included in the compose.
 
-### Compose up
+### Compose up and start
 
-Compose the docker image from the `Dockerfile` and start the image.
+Compose the docker image from the `Dockerfile` and start a new container.
+Optionally pass the `-d` flag to start the container in the background.
+
+```bash
+docker compose up --build --remove-orphans --force-recreate
+```
+
+Stop the container (gracefully) with `CTRL+C` when not using the `-d` flag.
+
+Restart an already created container with the following command (don't rebuild)
 
 ```bash
 docker compose up
 ```
 
-Stop the container (gracefully) with `CTRL+C`. To start the container again, use the same `up` command.
+Stop a background container (started with the `-d` flag).
+
+```bash
+docker compose stop
+```
 
 ### Compose down
 
 Stop the container and/or delete the Docker image.
 
 ```bash
-docker compose down
+docker compose down --remove-orphans
 ```
 
 Composing down will delete the current container and remove persistent data used by the bot, such as settings (snapshot interval, attendance rate) and snapshot data. However, due to the low setup complexity of the bot (and that snapshot data is cleared on each bot start anyways), using a volume to persist this data does not make sense for the small gain. 
+
+### View running containers
+
+```bash
+docker ps
+```
 
 ### View images
 
