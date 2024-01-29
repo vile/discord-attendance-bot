@@ -155,12 +155,12 @@ Compose the docker image from the `Dockerfile` and start a new container.
 Optionally pass the `-d` flag to start the container in the background.
 
 ```bash
-docker compose up --build --remove-orphans --force-recreate
+docker compose up --build --remove-orphans
 ```
 
 Stop the container (gracefully) with `CTRL+C` when not using the `-d` flag.
 
-Restart an already created container with the following command (don't rebuild)
+Restart an already created container with the following command (don't rebuild).
 
 ```bash
 docker compose up
