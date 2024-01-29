@@ -89,7 +89,7 @@ venv/
 # VS Code
 .vscode/
 
-# Data
+# Shelve
 database
 
 # Documentation
@@ -101,3 +101,7 @@ SECURITY.md
 # Makefile
 Makefile
 Makefile.venv
+
+# Dev
+compose.dev.yaml
+dev.Dockerfile

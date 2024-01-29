@@ -161,3 +161,7 @@ cython_debug/
 
 # Shelve
 database
+
+# Dev
+compose.dev.yaml
+dev.Dockerfile
