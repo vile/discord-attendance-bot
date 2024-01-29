@@ -1,3 +1,4 @@
+import logging
 import os
 
 import discord
@@ -16,10 +17,11 @@ class SettingCommandsCog(
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+        self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        print(f"{self.__cog_name__} cog loaded")
+        self.logger.info("cog loaded")
 
     @app_commands.command(name="get-attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:

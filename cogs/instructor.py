@@ -1,3 +1,4 @@
+import logging
 import os
 
 import discord
@@ -16,10 +17,11 @@ class InstructorCommandsCog(
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+        self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        print(f"{self.__cog_name__} cog loaded")
+        self.logger.info("cog loaded")
 
     @app_commands.command(name="add", description=descriptions.INSTRUCTOR_ADD)  # fmt: skip
     @app_commands.describe(member=descriptions.INSTRUCTOR_ADD_MEMBER)  # fmt: skip

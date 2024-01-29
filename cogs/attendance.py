@@ -1,3 +1,4 @@
+import logging
 import os
 
 import discord
@@ -16,11 +17,12 @@ class AttendanceCommandsCog(
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+        self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
         self.voice_channel = 0
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        print(f"{self.__cog_name__} cog loaded")
+        self.logger.info("cog loaded")
 
     @app_commands.command(name="start", description=descriptions.ATTENDANCE_START_SESSION)  # fmt: skip
     @app_commands.describe(channel=descriptions.ATTENDANCE_START_SESSION_CHANNEL)  # fmt: skip

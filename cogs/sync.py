@@ -1,3 +1,4 @@
+import logging
 from typing import Literal, Optional
 
 import discord
@@ -12,10 +13,11 @@ class SyncComanndsCog(
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
+        self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        print(f"{self.__cog_name__} cog loaded")
+        self.logger.info("cog loaded")
 
     @commands.command()
     async def sync(
