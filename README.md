@@ -13,11 +13,13 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
 
 1. Git - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
    1. Check if you have Git installed with `git --version`
-2. Python (3.10) - [Install Python (Windows)](https://www.python.org/downloads/windows/), [Install Python (Linux)](https://docs.python.org/3/using/unix.html)
+2. Python (>=3.10; <4) - [Install Python (Windows)](https://www.python.org/downloads/windows/), [Install Python (Linux)](https://docs.python.org/3/using/unix.html)
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
-4. Docker - [Install Docker](https://docs.docker.com/engine/install/) (Optionally)
+4. Poetry -[Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
+   1. Check if you have Poetry installed with `poetry --version`
+5. Docker - [Install Docker](https://docs.docker.com/engine/install/) (Optionally)
    1. Check if you have Docker installed with `docker --version`
 
 ## Usage
@@ -89,13 +91,17 @@ mv .env.example .env
 Put your bot's token in .env as `DISCORD_BOT_TOKEN`.
 Put your guild's ID in .env as `GUILD_ID`.
 
-#### Create venv
+### Quick Start
+
+This will create a venv and install the required dependencies with Poetry then immediately start the bot.
 
 ```bash
-make venv
+make
 ```
 
-#### Install dependencies
+### Normal Start
+
+#### Create venv and install dependencies with Poetry
 
 ```bash
 make deps
