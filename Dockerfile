@@ -1,14 +1,18 @@
-FROM gorialis/discord.py:3.10.10-alpine-pypi-minimal
+FROM python:3.10-alpine3.19
 
 WORKDIR /app
-
-RUN pip install poetry
 
 # Copy Poetry files
 COPY pyproject.toml ./
 COPY poetry.lock ./
 
-RUN poetry install --no-root --no-cache
+ENV PATH="${PATH}:/root/.local/bin"
+
+RUN apk add build-base libffi-dev bash pipx --no-cache && \
+    pipx install poetry && \
+    pipx ensurepath && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root --no-cache
 
 COPY . .
 
