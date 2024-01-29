@@ -2,9 +2,15 @@ FROM gorialis/discord.py:3.10.10-alpine-pypi-minimal
 
 WORKDIR /app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install poetry
+
+# Copy Poetry files
+COPY pyproject.toml ./
+COPY poetry.lock ./
+
+RUN poetry install --no-root --no-cache
 
 COPY . .
 
-CMD ["python", "main.py"]
+# Start bot with Poetry (venv)
+CMD ["poetry", "run", "python3", "main.py"]
