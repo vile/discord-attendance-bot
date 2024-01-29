@@ -2,7 +2,9 @@
 
 all: deps start
 
-deps :; poetry install --no-root
+deps:
+	poetry config virtualenvs.in-project true
+	poetry install --no-root
 
 start :; $(VENV)/python3.10 main.py
 
