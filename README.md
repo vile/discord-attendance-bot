@@ -112,7 +112,7 @@ make deps
 make start
 ```
 
-#### Sync Commands to Guild
+### Sync Commands to Guild
 
 To make application commands available in the server, mention the bot to invoke the `sync` text command.
 Where `~` syncs all guild commands to the current guild (see: [command body](https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html#command-body), [archive](https://archive.ph/vsSFz)).
