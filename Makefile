@@ -1,10 +1,9 @@
-venv :
-	python3.10 -m venv .venv
+.PHONY: all deps start
 
-deps :
-	$(VENV)/pip install -r requirements.txt 
+all: deps start
 
-start :
-	$(VENV)/python3.10 main.py
+deps :; poetry install --no-root
+
+start :; $(VENV)/python3.10 main.py
 
 include Makefile.venv
