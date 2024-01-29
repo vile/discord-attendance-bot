@@ -1,8 +1,17 @@
-[project]
-name = "discord-attendance-bot"
+[tool.poetry]
+name = "class-attendance-discord-bot"
 version = "1.0.0"
 description = "A simple Discord bot for taking and reporting attendance of users within a specific voice channel."
-readme = "README.md"
+authors = ["Vile <111662603+vile@users.noreply.github.com>"]
 license = "MIT"
-requires-python = "3.10"
-dependencies = ["discord.py==2.3.2", "python-dotenv==1.0.0"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+"discord.py" = "2.3.2"
+python-dotenv = "1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
