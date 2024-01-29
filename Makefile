@@ -6,6 +6,6 @@ deps:
 	poetry config virtualenvs.in-project true
 	poetry install --no-root
 
-start :; $(VENV)/python3 main.py
+start :; poetry run python3 main.py
 
 include Makefile.venv
