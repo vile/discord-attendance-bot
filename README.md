@@ -145,8 +145,10 @@ After the command tree has been synced, the bot no longer requires the `Send Mes
 ## Using the bot with Docker
 
 It might be necessary to prefix commands with `sudo` when using `docker compose` commands.
-[gorialis's](https://github.com/gorialis) discord.py [Docker base](https://hub.docker.com/r/gorialis/discord.py/) is used for this repo.
 Use the `.env` file as normal (include your `DISCORD_BOT_TOKEN` and `GUILD_ID`), it is included in the compose.
+
+> [!CAUTION]
+> **Composed images should NOT be shared or uploaded to public repos/hubs, your bot's token is included in the image environment variables.**
 
 ### Compose up and start
 
