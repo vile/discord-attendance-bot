@@ -17,9 +17,9 @@ Originally created for [Boring Security DAO](https://twitter.com/BoringSecDAO).
    1. Check if you have Python installed with `python3 --version`
 3. Pip - [Install Pip](https://pip.pypa.io/en/stable/installation/)
    1. Check if you have Pip installed with `pip --version`
-4. Poetry - [Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
+4. Poetry - [Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) (preferrably with [pipx](https://github.com/pypa/pipx))
    1. Check if you have Poetry installed with `poetry --version`
-5. Docker - [Install Docker](https://docs.docker.com/engine/install/) (Optionally)
+5. Docker - [Install Docker](https://docs.docker.com/engine/install/) (optionally)
    1. Check if you have Docker installed with `docker --version`
 
 ## Usage
