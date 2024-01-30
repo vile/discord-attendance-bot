@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Union
 
 import discord
 from discord import app_commands
@@ -27,7 +28,9 @@ class AttendanceCommandsCog(
     @app_commands.command(name="start", description=descriptions.ATTENDANCE_START_SESSION)  # fmt: skip
     @app_commands.describe(channel=descriptions.ATTENDANCE_START_SESSION_CHANNEL)  # fmt: skip
     async def start_session(
-        self, interaction: discord.Interaction, channel: discord.VoiceChannel
+        self,
+        interaction: discord.Interaction,
+        channel: Union[discord.VoiceChannel, discord.StageChannel],
     ) -> None:
         if self.snapshot_task.is_running():
             await interaction.response.send_message(
