@@ -97,6 +97,16 @@ class AttendanceCommandsCog(
             )
             return
 
+        permissions: discord.Permissions = interaction.channel.permissions_for(
+            interaction.guild.get_member(self.client.application_id)
+        )
+        if not permissions.send_messages:
+            await interaction.response.send_message(
+                f"I can't send messages in this channel. Make sure I have permissions from one of my roles or through a channel override in {interaction.channel.mention}. Then, use this command again to get an attendance report.",
+                ephemeral=True,
+            )
+            return
+
         snapshots: list[int] = shelve_utils.get_snapshots()
 
         if len(snapshots) == 0:
