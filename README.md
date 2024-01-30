@@ -41,7 +41,7 @@ This repo assumes you understand how to create an application through the [Disco
 
 #### Invite the bot
 
-The bot requires no intents or specific permissions when inviting it; `Send Messages` is only temporarily required during bot setup.
+The bot requires no intents or specific permissions when inviting it; `Send Messages` is only temporarily required, globally, during bot setup.
 If the voice channel(s) you intend to use with the bot require a specific role or are otherwise restricted in some way, you need to grant an explicit `View Channel` permission to the bot for that voice channel.
 Otherwise, the bot is able to view all voice channels the `@everyone` role can view.
 To generate a bot invite link, go to your bot's application page in the [Discord Dev Portal](https://discord.com/developers/applications), then navigate to `OAuth2` -> `URL Generator`.
@@ -132,7 +132,7 @@ If application commands are not synced to the guild, the bot integration will sh
 
 </details>
 
-After the command tree has been synced, the bot no longer requires the `Send Messages` permission.
+After the command tree has been synced, the bot no longer requires the global `Send Messages` permission.
 
 <details>
 <summary>Properly synced commands</summary>
