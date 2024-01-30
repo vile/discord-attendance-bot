@@ -168,7 +168,7 @@ class AttendanceCommandsCog(
         if not valid_instructor_in_channel:
             self.snapshot_task.cancel()
 
-        print(f"taking member snapshot #{self.snapshot_task.current_loop}")
+        self.logger.info(f"Taking member snapshot #{self.snapshot_task.current_loop}")
         shelve_utils.take_member_snapshot(members_as_ids)
 
     def cog_unload(self) -> None:
