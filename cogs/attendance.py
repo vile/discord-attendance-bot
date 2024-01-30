@@ -23,7 +23,7 @@ class AttendanceCommandsCog(
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.logger.info("cog loaded")
+        self.logger.info("Cog loaded")
 
     @app_commands.command(name="start", description=descriptions.ATTENDANCE_START_SESSION)  # fmt: skip
     @app_commands.describe(channel=descriptions.ATTENDANCE_START_SESSION_CHANNEL)  # fmt: skip

@@ -17,7 +17,7 @@ class SyncComanndsCog(
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.logger.info("cog loaded")
+        self.logger.info("Cog loaded")
 
     @commands.command()
     async def sync(

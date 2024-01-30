@@ -21,7 +21,7 @@ class SettingCommandsCog(
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.logger.info("cog loaded")
+        self.logger.info("Cog loaded")
 
     @app_commands.command(name="get-attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:

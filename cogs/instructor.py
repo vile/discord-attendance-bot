@@ -21,7 +21,7 @@ class InstructorCommandsCog(
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        self.logger.info("cog loaded")
+        self.logger.info("Cog loaded")
 
     @app_commands.command(name="add", description=descriptions.INSTRUCTOR_ADD)  # fmt: skip
     @app_commands.describe(member=descriptions.INSTRUCTOR_ADD_MEMBER)  # fmt: skip
