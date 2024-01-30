@@ -1,4 +1,4 @@
-.PHONY: all deps start dockerup dockerdown
+.PHONY: all deps start dockerup-build dockerup dockerdown
 
 all: deps start
 
