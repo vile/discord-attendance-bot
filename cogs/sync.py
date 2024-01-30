@@ -26,6 +26,12 @@ class SyncComanndsCog(
         guilds: commands.Greedy[discord.Object],
         spec: Optional[Literal["~", "*", "^"]] = None,
     ) -> None:
+        permissions: discord.Permissions = ctx.channel.permissions_for(
+            ctx.guild.get_member(self.client.application_id)
+        )
+        if not permissions.send_messages:
+            return
+
         if not guilds:
             if spec == "~":
                 synced = await ctx.bot.tree.sync(guild=ctx.guild)
