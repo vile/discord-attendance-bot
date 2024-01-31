@@ -148,7 +148,7 @@ class AttendanceCommandsCog(
 
         message: str = ""
         for member, did_attend in attendance_met.items():
-            pre_format: str = f"- <@{member}> "
+            pre_format: str = f"- <@{member}>"
             if did_attend:
                 message += f"{pre_format} ✅ **ATTENDED**\n"
             else:
