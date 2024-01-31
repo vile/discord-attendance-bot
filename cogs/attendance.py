@@ -176,7 +176,6 @@ class AttendanceCommandsCog(
 
         content: str = ""
         if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
-            # TODO: Add message saying that data is truncated due to the 10 embed limit
             content = ":bangbang: The amount of students present in this attendance report has exceeded the message length allowed by the Discord API. Therefore this message only shows a truncated list of students and their attendance."
 
         await interaction.response.send_message(
