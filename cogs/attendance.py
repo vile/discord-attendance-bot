@@ -129,7 +129,24 @@ class AttendanceCommandsCog(
             else:
                 attendance_met[member] = False
 
-        message: str = f"Attendance for the recent attendance session:\n- Total Attended: {len(attendance_met.keys())}\n- Total Snapshots: {len(snapshots)}\n\nStatus:\n"
+        embeds: list[discord.Embed] = []
+        max_embed_description_length: int = 3000
+
+        # Embed 1
+        # - Attendance report header message
+        # - Stats (total attended, total snapshots, present instructors?)
+
+        header_embed: discord.Embed = discord.Embed(
+            title="Attendance Report",
+            description=f"- Total Attended: {len(attendance_met.keys())}\n- Total Snapshots: {len(snapshots)}",
+        )
+
+        embeds.append(header_embed)
+
+        # Embed 2, 3, ...
+        # - List of attended/absent members
+
+        message: str = ""
         for member, did_attend in attendance_met.items():
             pre_format: str = f"- <@{member}> "
             if did_attend:
@@ -137,7 +154,17 @@ class AttendanceCommandsCog(
             else:
                 message += f"{pre_format} ❌ **ABSENT**\n"
 
-        await interaction.response.send_message(message)
+            if len(message) >= max_embed_description_length:
+                self.logger.info("Max description length exceeded, appending new embed")
+                embed: discord.Embed = discord.Embed(description=message)
+                embeds.append(embed)
+                message = ""
+        else:
+            if len(message) > 0:
+                embed: discord.Embed = discord.Embed(description=message)
+                embeds.append(embed)
+
+        await interaction.response.send_message(embeds=embeds)
 
     @app_commands.command(name="clear", description=descriptions.ATTENDANCE_CLEAR_ATTENDANCE)  # fmt: skip
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
