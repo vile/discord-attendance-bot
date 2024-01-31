@@ -6,6 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import cogs.utils.constants as constants
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
@@ -130,7 +131,6 @@ class AttendanceCommandsCog(
                 attendance_met[member] = False
 
         embeds: list[discord.Embed] = []
-        max_embed_description_length: int = 3000
 
         # Embed 1
         # - Attendance report header message
@@ -154,15 +154,23 @@ class AttendanceCommandsCog(
             else:
                 message += f"{pre_format} ❌ **ABSENT**\n"
 
-            if len(message) >= max_embed_description_length:
+            if len(message) >= constants.MAXMIMUM_EMBED_DESCRIPTION_LENGTH:
+                if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
+                    # Do not add any embeds past 10, Discord API only allows up to 10 embeds per response
+                    break
+
                 self.logger.info("Max description length exceeded, appending new embed")
                 embed: discord.Embed = discord.Embed(description=message)
                 embeds.append(embed)
                 message = ""
         else:
-            if len(message) > 0:
+            if len(message) > 0 and len(embeds) < constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
                 embed: discord.Embed = discord.Embed(description=message)
                 embeds.append(embed)
+
+        if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
+            # TODO: Add message saying that data is truncated due to the 10 embed limit
+            ...
 
         await interaction.response.send_message(embeds=embeds)
 
