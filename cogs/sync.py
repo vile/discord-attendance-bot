@@ -57,6 +57,31 @@ class SyncComanndsCog(
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+    @commands.command()
+    async def reload(self, ctx: commands.Context, cog: str) -> None:
+        can_send_messages: bool = ctx.channel.permissions_for(
+            ctx.guild.get_member(self.client.application_id)
+        ).send_messages
+
+        reloaded: bool = True
+        try:
+            await self.client.reload_extension(f"cogs.{cog}")
+        except Exception:
+            reloaded = False
+
+        if reloaded:
+            self.logger.info(f"Successfully reloaded cogs.{cog}")
+
+            if can_send_messages:
+                await ctx.send(f"Successfully reloaded the `{cog}` cog")
+        else:
+            self.logger.info(f"Failed to reload the `{cog}` cog")
+
+            if can_send_messages:
+                await ctx.send(
+                    f"Failed to reload the `{cog}` cog. Does this cog/extension exist?"
+                )
+
 
 async def setup(client: commands.Bot) -> None:
     cog: SyncComanndsCog = SyncComanndsCog(client)
