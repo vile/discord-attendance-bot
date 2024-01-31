@@ -11,22 +11,21 @@ import cogs.utils.constants as constants
 
 class AttendanceBot(commands.Bot):
     def __init__(self) -> None:
-        client_intents = discord.Intents.all()
-        client_intents.presences = False
-        client_intents.members = False
-        client_intents.message_content = False
+        client_intents = discord.Intents.default()
 
         super().__init__(
             command_prefix=commands.when_mentioned,
             intents=client_intents,
+            help_command=None,
         )
 
-        self.remove_command("help")
-
-    async def setup_hook(self) -> None:
+    async def load_extensions(self) -> None:
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
                 await self.load_extension(f"cogs.{filename[:-3]}")
+
+    async def setup_hook(self) -> None:
+        await self.load_extensions()
 
 
 async def main() -> None:
@@ -54,7 +53,7 @@ async def main() -> None:
         - list of ints (user ids) that were in the VC (in attendance) when the snapshot was taken
         """
 
-    client = AttendanceBot()
+    client: AttendanceBot = AttendanceBot()
     async with client:
         await client.start(os.getenv("DISCORD_BOT_TOKEN"))
 
