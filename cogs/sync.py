@@ -9,7 +9,7 @@ from discord.ext import commands
 @commands.guild_only()
 class SyncComanndsCog(
     commands.GroupCog,
-    name="sync",
+    name="dev",
 ):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
