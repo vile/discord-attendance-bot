@@ -22,11 +22,9 @@ class SyncComanndsCog(
         guilds: commands.Greedy[discord.Object],
         spec: Optional[Literal["~", "*", "^"]] = None,
     ) -> None:
-        permissions: discord.Permissions = ctx.channel.permissions_for(
+        can_send_messages: bool = ctx.channel.permissions_for(
             ctx.guild.get_member(self.client.application_id)
-        )
-        if not permissions.send_messages:
-            return
+        ).send_messages
 
         if not guilds:
             if spec == "~":
@@ -41,9 +39,10 @@ class SyncComanndsCog(
             else:
                 synced = await ctx.bot.tree.sync()
 
-            await ctx.send(
-                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
-            )
+            message: str = f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            self.logger.info(message)
+            if can_send_messages:
+                await ctx.send(message)
             return
 
         ret = 0
@@ -55,7 +54,10 @@ class SyncComanndsCog(
             else:
                 ret += 1
 
-        await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+        message: str = f"Synced the tree to {ret}/{len(guilds)}."
+        self.logger.info(message)
+        if can_send_messages:
+            await ctx.send(message)
 
     @commands.command()
     async def reload(self, ctx: commands.Context, cog: str) -> None:
