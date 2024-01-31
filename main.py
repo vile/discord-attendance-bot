@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import shelve
 
@@ -60,4 +61,7 @@ async def main() -> None:
 
 if __name__ == "__main__":
     discord.utils.setup_logging()
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.getLogger("main").info("Handling keyboard interrupt")
