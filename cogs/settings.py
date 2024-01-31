@@ -19,10 +19,6 @@ class SettingCommandsCog(
         self.client = client
         self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.logger.info("Cog loaded")
-
     @app_commands.command(name="get-attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
@@ -95,6 +91,6 @@ class SettingCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(
-        SettingCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
-    )
+    cog: SettingCommandsCog = SettingCommandsCog(client)
+    await client.add_cog(cog, guild=discord.Object(int(os.getenv("GUILD_ID"))))
+    cog.logger.info("Cog loaded")

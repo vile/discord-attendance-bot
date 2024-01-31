@@ -15,10 +15,6 @@ class SyncComanndsCog(
         self.client = client
         self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.logger.info("Cog loaded")
-
     @commands.command()
     async def sync(
         self,
@@ -63,4 +59,6 @@ class SyncComanndsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(SyncComanndsCog(client))
+    cog: SyncComanndsCog = SyncComanndsCog(client)
+    await client.add_cog(cog)
+    cog.logger.info("Cog loaded")

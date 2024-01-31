@@ -21,10 +21,6 @@ class AttendanceCommandsCog(
         self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
         self.voice_channel = 0
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.logger.info("Cog loaded")
-
     @app_commands.command(name="start", description=descriptions.ATTENDANCE_START_SESSION)  # fmt: skip
     @app_commands.describe(channel=descriptions.ATTENDANCE_START_SESSION_CHANNEL)  # fmt: skip
     async def start_session(
@@ -187,6 +183,6 @@ class AttendanceCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(
-        AttendanceCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
-    )
+    cog: AttendanceCommandsCog = AttendanceCommandsCog(client)
+    await client.add_cog(cog, guild=discord.Object(int(os.getenv("GUILD_ID"))))
+    cog.logger.info("Cog loaded")

@@ -19,10 +19,6 @@ class InstructorCommandsCog(
         self.client = client
         self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.logger.info("Cog loaded")
-
     @app_commands.command(name="add", description=descriptions.INSTRUCTOR_ADD)  # fmt: skip
     @app_commands.describe(member=descriptions.INSTRUCTOR_ADD_MEMBER)  # fmt: skip
     async def add_instructor(
@@ -70,6 +66,6 @@ class InstructorCommandsCog(
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(
-        InstructorCommandsCog(client), guild=discord.Object(int(os.getenv("GUILD_ID")))
-    )
+    cog: InstructorCommandsCog = InstructorCommandsCog(client)
+    await client.add_cog(cog, guild=discord.Object(int(os.getenv("GUILD_ID"))))
+    cog.logger.info("Cog loaded")
