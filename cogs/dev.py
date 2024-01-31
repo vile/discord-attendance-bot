@@ -65,24 +65,18 @@ class SyncComanndsCog(
             ctx.guild.get_member(self.client.application_id)
         ).send_messages
 
-        reloaded: bool = True
         try:
             await self.client.reload_extension(f"cogs.{cog}")
         except Exception:
-            reloaded = False
-
-        if reloaded:
-            self.logger.info(f"Successfully reloaded cogs.{cog}")
-
-            if can_send_messages:
-                await ctx.send(f"Successfully reloaded the `{cog}` cog")
-        else:
             self.logger.info(f"Failed to reload the `{cog}` cog")
-
             if can_send_messages:
                 await ctx.send(
                     f"Failed to reload the `{cog}` cog. Does this cog/extension exist?"
                 )
+
+        self.logger.info(f"Successfully reloaded cogs.{cog}")
+        if can_send_messages:
+            await ctx.send(f"Successfully reloaded the `{cog}` cog")
 
 
 async def setup(client: commands.Bot) -> None:
