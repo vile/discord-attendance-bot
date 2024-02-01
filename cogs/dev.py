@@ -73,6 +73,7 @@ class SyncComanndsCog(
                 await ctx.send(
                     f"Failed to reload the `{cog}` cog. Does this cog/extension exist?"
                 )
+                return
 
         self.logger.info(f"Successfully reloaded cogs.{cog}")
         if can_send_messages:
