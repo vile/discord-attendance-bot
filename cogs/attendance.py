@@ -3,13 +3,14 @@ import os
 from typing import Union
 
 import discord
-from discord import app_commands
+from discord import Embed, app_commands
 from discord.ext import commands, tasks
 
 import cogs.utils.constants as constants
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
+from cogs.utils.embed_generator import create_embed, create_embed_error
 
 
 @app_commands.guild_only()
@@ -30,8 +31,11 @@ class AttendanceCommandsCog(
         channel: Union[discord.VoiceChannel, discord.StageChannel],
     ) -> None:
         if self.snapshot_task.is_running():
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 f"A session is already running in {self.client.get_channel(self.voice_channel).mention}",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -45,8 +49,11 @@ class AttendanceCommandsCog(
                 break
 
         if not valid_instructor_in_channel:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 f"You or another instructor needs to be in {channel.mention} to start a session",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -68,23 +75,32 @@ class AttendanceCommandsCog(
         elif not should_clear:
             auto_clear_message = "Snapshot auto clear is disabled"
 
+        embed: Embed = await create_embed(
+            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**"
+        )
         await interaction.response.send_message(
-            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**",
+            embed=embed,
             ephemeral=True,
         )
 
     @app_commands.command(name="stop", description=descriptions.ATTENDANCE_STOP_SESSION)  # fmt: skip
     async def stop_session(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_being_cancelled():
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "This session is already being canceled, please wait",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
         if not self.snapshot_task.is_running():
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "A session is not currently running, so there is nothing to stop",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -92,16 +108,22 @@ class AttendanceCommandsCog(
         self.voice_channel = 0
         self.snapshot_task.cancel()
 
-        await interaction.response.send_message(
+        embed: Embed = await create_embed(
             "Successfully stopped the active session, no longer taking snapshots",
+        )
+        await interaction.response.send_message(
+            embed=embed,
             ephemeral=True,
         )
 
     @app_commands.command(name="get", description=descriptions.ATTENDANCE_GET_ATTENDANCE)  # fmt: skip
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "Can't report attendance while a session is active. Stop the current session if you want to get a report",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -110,8 +132,11 @@ class AttendanceCommandsCog(
             interaction.guild.get_member(self.client.application_id)
         )
         if not permissions.send_messages:
+            embed: Embed = await create_embed_error(
+                f"I can't send messages in this channel. Make sure I have permissions from one of my roles or through a channel override in {interaction.channel.mention}. Then, use this command again to get an attendance report",
+            )
             await interaction.response.send_message(
-                f"I can't send messages in this channel. Make sure I have permissions from one of my roles or through a channel override in {interaction.channel.mention}. Then, use this command again to get an attendance report.",
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -119,8 +144,11 @@ class AttendanceCommandsCog(
         snapshots: list[int] = shelve_utils.get_snapshots()
 
         if len(snapshots) == 0:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "No available stopshot data to report attendance with",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -202,14 +230,18 @@ class AttendanceCommandsCog(
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
         success: bool = shelve_utils.clear_snapshots()
         if not success:
+            embed: Embed = await create_embed_error(
+                "Seems I couldn't clear attendance snapshots. Try again"
+            )
             await interaction.response.send_message(
-                "Seems I couldn't clear attendance snapshots. Try again",
+                embed=embed,
                 ephemeral=True,
             )
             return
 
+        embed: Embed = await create_embed("Successfully cleared attendance snapshots")
         await interaction.response.send_message(
-            "Successfully cleared attendance snapshots",
+            embed=embed,
             ephemeral=True,
         )
 

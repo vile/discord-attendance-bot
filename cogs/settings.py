@@ -3,12 +3,13 @@ import os
 import typing
 
 import discord
-from discord import app_commands
+from discord import Embed, app_commands
 from discord.ext import commands, tasks
 
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
+from cogs.utils.embed_generator import create_embed, create_embed_error
 
 
 @app_commands.guild_only()
@@ -24,8 +25,11 @@ class SettingCommandsCog(
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
 
+        embed: Embed = await create_embed(
+            f"The current minimum attendance rate is **{attendance_rate * 100:.0f}%**"
+        )
         await interaction.response.send_message(
-            f"The current minimum attendance rate is **{attendance_rate * 100:.0f}%**",
+            embed=embed,
             ephemeral=True,
         )
 
@@ -39,14 +43,20 @@ class SettingCommandsCog(
         success: bool = shelve_utils.set_attendace_rate(rate)
 
         if not success:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "There seems to have been an issue setting the attendance rate. Try again",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
-        await interaction.response.send_message(
+        embed: Embed = await create_embed(
             f"Successfully set the required attendance rate to **{rate * 100:.0f}%**",
+        )
+        await interaction.response.send_message(
+            embed=embed,
             ephemeral=True,
         )
 
@@ -54,8 +64,11 @@ class SettingCommandsCog(
     async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
         snapshot_interval: int = shelve_utils.get_snapshot_interval()
 
+        embed: Embed = await create_embed(
+            f"The current snapshot rate is **{snapshot_interval} seconds**"
+        )
         await interaction.response.send_message(
-            f"The current snapshot rate is **{snapshot_interval} seconds**",
+            embed=embed,
             ephemeral=True,
         )
 
@@ -70,8 +83,11 @@ class SettingCommandsCog(
         snapshot_task: tasks.Loop = attendance_cog.snapshot_task
 
         if snapshot_task.is_running() or snapshot_task.is_being_cancelled():
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "You can't set the snapshot interval while a session is running or being canceled. Stop your current session or wait a few seconds for the current session to finish canceling",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
@@ -79,14 +95,20 @@ class SettingCommandsCog(
         success: bool = shelve_utils.set_snapshot_interval(interval)
 
         if not success:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "There seems to have been an issue setting the snapshot interval. Try again",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
-        await interaction.response.send_message(
+        embed: Embed = await create_embed(
             f"Successfully set the snapshot interval to **{interval} seconds**",
+        )
+        await interaction.response.send_message(
+            embed=embed,
             ephemeral=True,
         )
 
@@ -100,8 +122,11 @@ class SettingCommandsCog(
             shelve_utils.get_auto_clear_after_attendance_report()
         )
 
+        embed: Embed = await create_embed(
+            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**"
+        )
         await interaction.response.send_message(
-            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**",
+            embed=embed,
             ephemeral=True,
         )
 
@@ -122,14 +147,20 @@ class SettingCommandsCog(
             )
 
         if not success:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 f"There seems to have been an issue setting auto clear for `{on_event}` to `{should_clear}`",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
-        await interaction.response.send_message(
+        embed: Embed = await create_embed(
             f"Successfully set auto clear for `{on_event}` to `{should_clear}`",
+        )
+        await interaction.response.send_message(
+            embed=embed,
             ephemeral=True,
         )
 

@@ -2,12 +2,13 @@ import logging
 import os
 
 import discord
-from discord import app_commands
+from discord import Embed, app_commands
 from discord.ext import commands
 
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
+from cogs.utils.embed_generator import create_embed, create_embed_error
 
 
 @app_commands.guild_only()
@@ -26,14 +27,20 @@ class InstructorCommandsCog(
     ) -> None:
         success: bool = shelve_utils.add_instructor(member.id)
         if not success:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
+        embed: Embed = await create_embed(
+            f"Successfully added {member.mention} as an instructor"
+        )
         await interaction.response.send_message(
-            f"Successfully added {member.mention} as an instructor",
+            embed=embed,
             ephemeral=True,
         )
 
@@ -44,14 +51,20 @@ class InstructorCommandsCog(
     ) -> None:
         success: bool = shelve_utils.remove_instructor(member.id)
         if not success:
-            await interaction.response.send_message(
+            embed: Embed = await create_embed_error(
                 "I couldn't remove this member. Are you sure they're an existing instructor?",
+            )
+            await interaction.response.send_message(
+                embed=embed,
                 ephemeral=True,
             )
             return
 
+        embed: Embed = await create_embed(
+            f"Successfully removed  {member.mention} as an instructor"
+        )
         await interaction.response.send_message(
-            f"Successfully removed  {member.mention} as an instructor",
+            embed=embed,
             ephemeral=True,
         )
 
@@ -62,7 +75,8 @@ class InstructorCommandsCog(
         if formatted_message == "":
             formatted_message = "There are no instructors to show!"
 
-        await interaction.response.send_message(formatted_message, ephemeral=True)
+        embed: Embed = await create_embed(formatted_message, title="Instructors")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 async def setup(client: commands.Bot) -> None:
