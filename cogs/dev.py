@@ -67,8 +67,8 @@ class SyncComanndsCog(
 
         try:
             await self.client.reload_extension(f"cogs.{cog}")
-        except Exception:
-            self.logger.info(f"Failed to reload cogs.{cog}")
+        except Exception as error:
+            self.logger.info(f"Failed to reload cogs.{cog}, {error}")
             if can_send_messages:
                 await ctx.send(
                     f"Failed to reload the `{cog}` cog. Does this cog/extension exist?"
