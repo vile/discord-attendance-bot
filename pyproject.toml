@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "class-attendance-discord-bot"
+name = "discord-attendance-bot"
 version = "1.0.0"
 description = "A simple Discord bot for taking and reporting attendance of users within a specific voice channel."
 authors = ["Vile <111662603+vile@users.noreply.github.com>"]
