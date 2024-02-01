@@ -19,6 +19,10 @@ SETTINGS_GET_MINIMUM_ATTENDANCE: Final[str] = "Get the current minimum attendanc
 SETTINGS_SET_MINIMUM_ATTENDANCE: Final[str] = "Set the minimum attendance rate"
 SETTINGS_GET_INTERVAL: Final[str] = "Get the current snapshot interval"
 SETTINGS_SET_INTERVAL: Final[str] = "Set the snapshot interval"
+SETTINGS_GET_AUTO_CLEAR: Final[str] = "Get the current auto clear settings"
+SETTINGS_SET_AUTO_CLEAR: Final[str] = "Enable or disable snapshot auto clear for a specific event"
 
 SETTINGS_SET_MINIMUM_ATTENDANCE_RATE: Final[str] = "The minimum number, in percentage (0.1 = 10%), of snapshots a user needs to be present in to be counted as in attendance"
 SETTINGS_SET_INTERVAL_INTERVAL: Final[str] = "The time interval, in seconds, a snapshot should be taken of the members lists in the session VC"
+SETTINGS_SET_AUTO_CLEAR_ON_EVENT: Final[str] = "The event to enable or disable auto clear for"
+SETTINGS_SET_AUTO_CLEAR_SHOULD_CLEAR: Final[str] = "Whether or not snapshot data should be auto cleared on this event"

@@ -43,6 +43,12 @@ async def main() -> None:
         if "snapshot_interval" not in handle:
             handle["snapshot_interval"] = constants.DEFAULT_SNAPSHOT_INTERVAL_SECONDS  # fmt: skip
 
+        if "auto_clear_snapshots_on_new_session" not in handle:
+            handle["auto_clear_snapshots_on_new_session"] = constants.DEFAULT_AUTO_CLEAR_SNAPSHOTS_ON_NEW_SESSION  # fmt: skip
+
+        if "auto_clear_snapshots_after_attendance_report" not in handle:
+            handle["auto_clear_snapshots_after_attendance_report"] = constants.DEFAULT_AUTO_CLEAR_SNAPSHOTS_AFTER_ATTENDANCE_REPORT  # fmt: skip
+
         # Always reset snapshots when bot is restarted
         handle["snapshots"] = []
 

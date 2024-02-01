@@ -1,5 +1,6 @@
 import logging
 import os
+import typing
 
 import discord
 from discord import app_commands
@@ -86,6 +87,49 @@ class SettingCommandsCog(
 
         await interaction.response.send_message(
             f"Successfully set the snapshot interval to **{interval} seconds**",
+            ephemeral=True,
+        )
+
+    @app_commands.command(name="get-auto-clear", description=descriptions.SETTINGS_GET_AUTO_CLEAR)  # fmt: skip
+    async def get_auto_clear(
+        self,
+        interaction: discord.Interaction,
+    ) -> None:
+        should_clear_new_session: bool = shelve_utils.get_auto_clear_on_new_session()
+        should_clear_after_attendance: bool = (
+            shelve_utils.get_auto_clear_after_attendance_report()
+        )
+
+        await interaction.response.send_message(
+            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**",
+            ephemeral=True,
+        )
+
+    @app_commands.command(name="set-auto-clear", description=descriptions.SETTINGS_SET_AUTO_CLEAR)  # fmt: skip
+    @app_commands.describe(on_event=descriptions.SETTINGS_SET_AUTO_CLEAR_ON_EVENT)  # fmt: skip
+    @app_commands.describe(should_clear=descriptions.SETTINGS_SET_AUTO_CLEAR_SHOULD_CLEAR)  # fmt: skip
+    async def set_auto_clear(
+        self,
+        interaction: discord.Interaction,
+        on_event: typing.Literal["on new session", "after report"],
+        should_clear: bool,
+    ) -> None:
+        if on_event == "on new session":
+            success: bool = shelve_utils.set_auto_clear_on_new_session(should_clear)
+        elif on_event == "after report":
+            success: bool = shelve_utils.set_auto_clear_after_attendance_report(
+                should_clear
+            )
+
+        if not success:
+            await interaction.response.send_message(
+                f"There seems to have been an issue setting auto clear for `{on_event}` to `{should_clear}`",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.send_message(
+            f"Successfully set auto clear for `{on_event}` to `{should_clear}`",
             ephemeral=True,
         )
 

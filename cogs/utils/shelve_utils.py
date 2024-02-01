@@ -82,3 +82,31 @@ def set_snapshot_interval(interval: int) -> bool:
         handle["snapshot_interval"] = interval
 
     return interval == get_snapshot_interval()
+
+
+def get_auto_clear_on_new_session() -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        auto_clear: bool = handle["auto_clear_snapshots_on_new_session"]
+
+    return auto_clear
+
+
+def set_auto_clear_on_new_session(should_clear: bool) -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        handle["auto_clear_snapshots_on_new_session"] = should_clear
+
+    return should_clear == get_auto_clear_on_new_session()
+
+
+def get_auto_clear_after_attendance_report() -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        auto_clear: bool = handle["auto_clear_snapshots_after_attendance_report"]
+
+    return auto_clear
+
+
+def set_auto_clear_after_attendance_report(should_clear: bool) -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        handle["auto_clear_snapshots_after_attendance_report"] = should_clear
+
+    return should_clear == get_auto_clear_after_attendance_report()

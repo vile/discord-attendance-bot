@@ -51,13 +51,25 @@ class AttendanceCommandsCog(
             )
             return
 
+        should_clear: bool = shelve_utils.get_auto_clear_on_new_session()
+        if should_clear:
+            cleared_success: bool = shelve_utils.clear_snapshots()
+
         task_interval: int = shelve_utils.get_snapshot_interval()
         self.voice_channel = channel.id
         self.snapshot_task.change_interval(seconds=task_interval)
         self.snapshot_task.start()
 
+        auto_clear_message: str = ""
+        if should_clear and cleared_success:
+            auto_clear_message = "Snapshots have been auto cleared for this new session"
+        elif should_clear and not cleared_success:
+            auto_clear_message = "Snapshots failed to auto clear, if you wish to clear snapshot data, stop this session and manually clear snapshots"
+        elif not should_clear:
+            auto_clear_message = "Snapshot auto clear is disabled"
+
         await interaction.response.send_message(
-            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds!",
+            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**",
             ephemeral=True,
         )
 
@@ -136,15 +148,19 @@ class AttendanceCommandsCog(
             else:
                 attendance_met[member] = False
 
+        should_clear: bool = shelve_utils.get_auto_clear_after_attendance_report()
+        if should_clear:
+            cleared_success: bool = shelve_utils.clear_snapshots()
+
         embeds: list[discord.Embed] = []
 
         # Embed 1
         # - Attendance report header message
-        # - Stats (total attended, total snapshots, present instructors?)
+        # - Stats (total attended, total snapshots, present instructors, auto clear snapshots on/off + success/fail)
 
         header_embed: discord.Embed = discord.Embed(
             title="Attendance Report",
-            description=f"- **Total Attended**: `{len(attendance_met.keys())}`\n- **Total Snapshots**: `{len(snapshots)}`\n- **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}",
+            description=f"- **Total Attended**: `{len(attendance_met.keys())}`\n- **Total Snapshots**: `{len(snapshots)}`\n- **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}\n- **Auto Clear Snapshots**: {'`on`' if should_clear else '`off`'} {'(success)' if should_clear and cleared_success else ''}",
         )
 
         embeds.append(header_embed)
