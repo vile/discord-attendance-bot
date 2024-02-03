@@ -21,7 +21,11 @@ class SettingCommandsCog(
         self.client = client
         self.logger = logging.getLogger(f"cogs.{self.__cog_name__}")
 
-    @app_commands.command(name="get-attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
+    get_group: app_commands.Group = app_commands.Group(
+        name="get", description="Get current settings"
+    )
+
+    @get_group.command(name="attendance", description=descriptions.SETTINGS_GET_MINIMUM_ATTENDANCE)  # fmt: skip
     async def get_minium_attendance(self, interaction: discord.Interaction) -> None:
         attendance_rate: float = shelve_utils.get_attendance_rate()
 
@@ -33,7 +37,38 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="set-attendance", description=descriptions.SETTINGS_SET_MINIMUM_ATTENDANCE)  # fmt: skip
+    @get_group.command(name="interval", description=descriptions.SETTINGS_GET_INTERVAL)  # fmt: skip
+    async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
+        snapshot_interval: int = shelve_utils.get_snapshot_interval()
+
+        embed: Embed = await create_embed(
+            f"The current snapshot rate is **{snapshot_interval} seconds**"
+        )
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
+    @get_group.command(name="auto-clear", description=descriptions.SETTINGS_GET_AUTO_CLEAR)  # fmt: skip
+    async def get_auto_clear(self, interaction: discord.Interaction) -> None:
+        should_clear_new_session: bool = shelve_utils.get_auto_clear_on_new_session()
+        should_clear_after_attendance: bool = (
+            shelve_utils.get_auto_clear_after_attendance_report()
+        )
+
+        embed: Embed = await create_embed(
+            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**"
+        )
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
+    set_group: app_commands.Group = app_commands.Group(
+        name="set", description="Set new settings"
+    )
+
+    @set_group.command(name="attendance", description=descriptions.SETTINGS_SET_MINIMUM_ATTENDANCE)  # fmt: skip
     @app_commands.describe(rate=descriptions.SETTINGS_SET_MINIMUM_ATTENDANCE_RATE)  # fmt: skip
     async def set_minimum_attendance(
         self,
@@ -60,19 +95,7 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="get-interval", description=descriptions.SETTINGS_GET_INTERVAL)  # fmt: skip
-    async def get_snapshot_interval(self, interaction: discord.Interaction) -> None:
-        snapshot_interval: int = shelve_utils.get_snapshot_interval()
-
-        embed: Embed = await create_embed(
-            f"The current snapshot rate is **{snapshot_interval} seconds**"
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=True,
-        )
-
-    @app_commands.command(name="set-interval", description=descriptions.SETTINGS_SET_INTERVAL)  # fmt: skip
+    @set_group.command(name="interval", description=descriptions.SETTINGS_SET_INTERVAL)  # fmt: skip
     @app_commands.describe(interval=descriptions.SETTINGS_SET_INTERVAL_INTERVAL)  # fmt: skip
     async def set_snapshot_interval(
         self,
@@ -112,25 +135,7 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
-    @app_commands.command(name="get-auto-clear", description=descriptions.SETTINGS_GET_AUTO_CLEAR)  # fmt: skip
-    async def get_auto_clear(
-        self,
-        interaction: discord.Interaction,
-    ) -> None:
-        should_clear_new_session: bool = shelve_utils.get_auto_clear_on_new_session()
-        should_clear_after_attendance: bool = (
-            shelve_utils.get_auto_clear_after_attendance_report()
-        )
-
-        embed: Embed = await create_embed(
-            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**"
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=True,
-        )
-
-    @app_commands.command(name="set-auto-clear", description=descriptions.SETTINGS_SET_AUTO_CLEAR)  # fmt: skip
+    @set_group.command(name="auto-clear", description=descriptions.SETTINGS_SET_AUTO_CLEAR)  # fmt: skip
     @app_commands.describe(on_event=descriptions.SETTINGS_SET_AUTO_CLEAR_ON_EVENT)  # fmt: skip
     @app_commands.describe(should_clear=descriptions.SETTINGS_SET_AUTO_CLEAR_SHOULD_CLEAR)  # fmt: skip
     async def set_auto_clear(
