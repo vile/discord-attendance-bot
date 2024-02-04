@@ -100,8 +100,10 @@ SECURITY.md
 
 # Makefile
 Makefile
-Makefile.venv
 
 # Dev
 compose.dev.yaml
 dev.Dockerfile
+
+# Poetry
+requirements.txt

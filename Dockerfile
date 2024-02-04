@@ -1,4 +1,6 @@
-FROM python:3.10-alpine3.19
+##### DEPENDENCIES
+
+FROM python:3.10-alpine3.19 AS deps
 
 WORKDIR /app
 
@@ -10,9 +12,21 @@ COPY poetry.lock ./
 
 RUN apk add build-base libffi-dev bash pipx --no-cache && \
     pipx install poetry && \
-    poetry config virtualenvs.create false && \
+    poetry config virtualenvs.in-project true && \
     poetry install --no-root --no-cache
 
+##### RUNNER
+
+FROM python:3.10-alpine3.19 AS runner
+
+WORKDIR /app
+
+ENV PATH="${PATH}:/root/.local/bin"
+
+RUN apk add pipx --no-cache && \
+    pipx install poetry
+
+COPY --from=deps /app/.venv ./.venv
 COPY . .
 
 # Start bot with Poetry (venv)
