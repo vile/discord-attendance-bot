@@ -1,5 +1,6 @@
 import logging
 import os
+import textwrap
 import time
 from datetime import datetime
 from typing import Union
@@ -225,9 +226,23 @@ class AttendanceCommandsCog(
         # - Attendance report header message
         # - Stats (total attended, total snapshots, present instructors, auto clear snapshots on/off + success/fail)
 
+        snapshot_interval: int = shelve_utils.get_snapshot_interval()
+        assumed_session_length: int = num_snapshots * snapshot_interval
+        assumed_started_timestamp: datetime = datetime.fromtimestamp(
+            int(time.time()) - assumed_session_length
+        )
+
         header_embed: discord.Embed = discord.Embed(
             title="Attendance Report",
-            description=f"- **Class Size**: `{len(attendance_met.keys())}`\n- **Total Snapshots**: `{len(snapshots)}`\n- **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}\n- **Auto Clear Snapshots**: {'`on`' if should_clear else '`off`'} {'(success)' if should_clear and cleared_success else ''}",
+            description=textwrap.dedent(
+                f"""
+                - **Class Size**: `{len(attendance_met.keys())}`
+                - **Total Snapshots**: `{len(snapshots)}`
+                - **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}
+                - **Auto Clear Snapshots**: {'`on`' if should_clear else '`off`'} {'(success)' if should_clear and cleared_success else ''}
+                - **Start Time**: ~{discord.utils.format_dt(assumed_started_timestamp)} ({discord.utils.format_dt(assumed_started_timestamp, style='R')})
+                """
+            ),
         )
 
         embeds.append(header_embed)
