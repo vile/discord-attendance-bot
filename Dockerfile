@@ -1,9 +1,7 @@
 ##### DEPENDENCIES
 
 FROM python:3.10-alpine3.19 AS deps
-
 WORKDIR /app
-
 ENV PATH="${PATH}:/root/.local/bin"
 
 # Copy Poetry files
@@ -18,9 +16,7 @@ RUN apk add build-base libffi-dev bash pipx --no-cache && \
 ##### RUNNER
 
 FROM python:3.10-alpine3.19 AS runner
-
 WORKDIR /app
-
 ENV PATH="${PATH}:/root/.local/bin"
 
 RUN apk add pipx --no-cache && \
