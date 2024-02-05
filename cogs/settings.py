@@ -1,5 +1,6 @@
 import logging
 import os
+import textwrap
 import typing
 
 import discord
@@ -56,9 +57,13 @@ class SettingCommandsCog(
             shelve_utils.get_auto_clear_after_attendance_report()
         )
 
-        embed: Embed = await create_embed(
-            f"Auto clear `on new session`: **{should_clear_new_session}**\nAuto clear `after report`: **{should_clear_after_attendance}**"
+        message_for_embed = textwrap.dedent(
+            f"""
+            - Auto clear `on new session`: **{should_clear_new_session}**
+            - Auto clear `after report`: **{should_clear_after_attendance}**
+            """
         )
+        embed: Embed = await create_embed(message_for_embed)
         await interaction.response.send_message(
             embed=embed,
             ephemeral=True,
