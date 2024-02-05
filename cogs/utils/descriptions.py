@@ -3,6 +3,7 @@ from typing import Final
 # fmt: off
 ATTENDANCE_START_SESSION: Final[str] = "Start an attendance session, an instructor must be present in the VC at all times"
 ATTENDANCE_STOP_SESSION: Final[str] = "Stop the active attendance session"
+ATTENDANCE_STATS_SESSION: Final[str] = "Get stats for the active attendance session"
 ATTENDANCE_GET_ATTENDANCE: Final[str] = "Get an attendance report for your last active attendance session"
 ATTENDANCE_CLEAR_ATTENDANCE: Final[str] = "Permanently delete all snapshots from the last active attendance session"
 

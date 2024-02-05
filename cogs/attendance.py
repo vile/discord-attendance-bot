@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+from datetime import datetime
 from typing import Union
 
 import discord
@@ -110,6 +112,43 @@ class AttendanceCommandsCog(
 
         embed: Embed = await create_embed(
             "Successfully stopped the active session, no longer taking snapshots",
+        )
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
+    @app_commands.command(name="stats", description=descriptions.ATTENDANCE_STATS_SESSION)  # fmt: skip
+    async def get_stats_for_current_session(
+        self, interaction: discord.Interaction
+    ) -> None:
+        if not self.snapshot_task.is_running():
+            embed: Embed = await create_embed_error(
+                f"No active session is running to get stats for"
+            )
+            await interaction.response.send_message(
+                embed=embed,
+                ephemeral=True,
+            )
+            return
+
+        snapshot_interval: int = shelve_utils.get_snapshot_interval()
+        snapshots: list[int] = shelve_utils.get_snapshots()
+        num_snapshots: int = len(snapshots)
+        # Since the exact starting timestamp is not recorded, we can guess the
+        # rough start time (within one `snapshot_interval`), which is close enough
+        assumed_session_length: int = num_snapshots * snapshot_interval
+        assumed_started_timestamp: datetime = datetime.fromtimestamp(
+            int(time.time()) - assumed_session_length
+        )
+
+        message_for_embed: str = (
+            f"- **Number of Snapshots**: `{num_snapshots}`\n- **Snapshot Interval**: `{snapshot_interval}` seconds\n- **Start Time**: ~{discord.utils.format_dt(assumed_started_timestamp)} ({discord.utils.format_dt(assumed_started_timestamp, style='R')})"
+        )
+
+        embed: Embed = await create_embed(
+            message_for_embed,
+            title="Active session stats",
         )
         await interaction.response.send_message(
             embed=embed,
