@@ -232,30 +232,42 @@ class AttendanceCommandsCog(
 
         embeds.append(header_embed)
 
-        # Embed 2, 3, ...
-        # - List of attended/absent members
-
-        message: str = ""
-        for member, did_attend in attendance_met.items():
-            pre_format: str = f"- <@{member}>"
-            if did_attend:
-                message += f"{pre_format} ✅ **ATTENDED**\n"
-            else:
-                message += f"{pre_format} ❌ **ABSENT**\n"
-
-            if len(message) >= constants.MAXMIMUM_EMBED_DESCRIPTION_LENGTH:
-                if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
-                    # Do not add any embeds past 10, Discord API only allows up to 10 embeds per response
-                    break
-
-                self.logger.info("Max description length exceeded, appending new embed")
-                embed: discord.Embed = discord.Embed(description=message)
-                embeds.append(embed)
-                message = ""
+        # Check if there are zero non-instructor users
+        if len(attendance_met.keys()) == 0:
+            embed: discord.Embed = discord.Embed(
+                description="No students attended this session"
+            )
+            embeds.append(embed)
         else:
-            if len(message) > 0 and len(embeds) < constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
-                embed: discord.Embed = discord.Embed(description=message)
-                embeds.append(embed)
+            # Embed 2, 3, ...
+            # - List of attended/absent members
+
+            message: str = ""
+            for member, did_attend in attendance_met.items():
+                pre_format: str = f"- <@{member}>"
+                if did_attend:
+                    message += f"{pre_format} ✅ **ATTENDED**\n"
+                else:
+                    message += f"{pre_format} ❌ **ABSENT**\n"
+
+                if len(message) >= constants.MAXMIMUM_EMBED_DESCRIPTION_LENGTH:
+                    if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
+                        # Do not add any embeds past 10, Discord API only allows up to 10 embeds per response
+                        break
+
+                    self.logger.info(
+                        "Max description length exceeded, appending new embed"
+                    )
+                    embed: discord.Embed = discord.Embed(description=message)
+                    embeds.append(embed)
+                    message = ""
+            else:
+                if (
+                    len(message) > 0
+                    and len(embeds) < constants.MAXMIMUM_EMBEDS_PER_MESSAGE
+                ):
+                    embed: discord.Embed = discord.Embed(description=message)
+                    embeds.append(embed)
 
         content: str = ""
         if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
