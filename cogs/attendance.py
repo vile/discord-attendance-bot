@@ -143,8 +143,12 @@ class AttendanceCommandsCog(
             int(time.time()) - assumed_session_length
         )
 
-        message_for_embed: str = (
-            f"- **Number of Snapshots**: `{num_snapshots}`\n- **Snapshot Interval**: `{snapshot_interval}` seconds\n- **Start Time**: ~{discord.utils.format_dt(assumed_started_timestamp)} ({discord.utils.format_dt(assumed_started_timestamp, style='R')})"
+        message_for_embed: str = textwrap.dedent(
+            f"""
+            - **Number of Snapshots**: `{num_snapshots}`
+            - **Snapshot Interval**: `{snapshot_interval}` seconds
+            - **Start Time**: ~{discord.utils.format_dt(assumed_started_timestamp)} ({discord.utils.format_dt(assumed_started_timestamp, style='R')})
+            """
         )
 
         embed: Embed = await create_embed(
