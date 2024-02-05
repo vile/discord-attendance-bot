@@ -227,7 +227,7 @@ class AttendanceCommandsCog(
 
         header_embed: discord.Embed = discord.Embed(
             title="Attendance Report",
-            description=f"- **Total Attended**: `{len(attendance_met.keys())}`\n- **Total Snapshots**: `{len(snapshots)}`\n- **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}\n- **Auto Clear Snapshots**: {'`on`' if should_clear else '`off`'} {'(success)' if should_clear and cleared_success else ''}",
+            description=f"- **Class Size**: `{len(attendance_met.keys())}`\n- **Total Snapshots**: `{len(snapshots)}`\n- **Instructors Present**: {', '.join([f'<@{instructor}>' for instructor in instructors_present])}\n- **Auto Clear Snapshots**: {'`on`' if should_clear else '`off`'} {'(success)' if should_clear and cleared_success else ''}",
         )
 
         embeds.append(header_embed)
