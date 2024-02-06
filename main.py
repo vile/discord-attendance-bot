@@ -49,6 +49,9 @@ async def main() -> None:
         if "auto_clear_snapshots_after_attendance_report" not in handle:
             handle["auto_clear_snapshots_after_attendance_report"] = constants.DEFAULT_AUTO_CLEAR_SNAPSHOTS_AFTER_ATTENDANCE_REPORT  # fmt: skip
 
+        if "important_attendance_responses_are_ephemeral" not in handle:
+            handle["important_attendance_responses_are_ephemeral"] = constants.DEFAULT_IMPORTANT_ATTENDANCE_RESPONSES_ARE_EPHEMERAL  # fmt: skip
+
         # Always reset snapshots when bot is restarted
         handle["snapshots"] = []
 

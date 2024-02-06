@@ -78,12 +78,15 @@ class AttendanceCommandsCog(
         elif not should_clear:
             auto_clear_message = "Snapshot auto clear is disabled"
 
+        message_is_ephemeral: bool = (
+            shelve_utils.get_important_attendance_responses_are_ephemeral()
+        )
         embed: Embed = await create_embed(
             f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**"
         )
         await interaction.response.send_message(
             embed=embed,
-            ephemeral=True,
+            ephemeral=message_is_ephemeral,
         )
 
     @app_commands.command(name="stop", description=descriptions.ATTENDANCE_STOP_SESSION)  # fmt: skip
@@ -111,12 +114,15 @@ class AttendanceCommandsCog(
         self.voice_channel = 0
         self.snapshot_task.cancel()
 
+        message_is_ephemeral: bool = (
+            shelve_utils.get_important_attendance_responses_are_ephemeral()
+        )
         embed: Embed = await create_embed(
             "Successfully stopped the active session, no longer taking snapshots",
         )
         await interaction.response.send_message(
             embed=embed,
-            ephemeral=True,
+            ephemeral=message_is_ephemeral,
         )
 
     @app_commands.command(name="stats", description=descriptions.ATTENDANCE_STATS_SESSION)  # fmt: skip
@@ -151,13 +157,16 @@ class AttendanceCommandsCog(
             """
         )
 
+        message_is_ephemeral: bool = (
+            shelve_utils.get_important_attendance_responses_are_ephemeral()
+        )
         embed: Embed = await create_embed(
             message_for_embed,
             title="Active session stats",
         )
         await interaction.response.send_message(
             embed=embed,
-            ephemeral=True,
+            ephemeral=message_is_ephemeral,
         )
 
     @app_commands.command(name="get", description=descriptions.ATTENDANCE_GET_ATTENDANCE)  # fmt: skip
@@ -309,10 +318,13 @@ class AttendanceCommandsCog(
             )
             return
 
+        message_is_ephemeral: bool = (
+            shelve_utils.get_important_attendance_responses_are_ephemeral()
+        )
         embed: Embed = await create_embed("Successfully cleared attendance snapshots")
         await interaction.response.send_message(
             embed=embed,
-            ephemeral=True,
+            ephemeral=message_is_ephemeral,
         )
 
     @tasks.loop()

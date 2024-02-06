@@ -110,3 +110,19 @@ def set_auto_clear_after_attendance_report(should_clear: bool) -> bool:
         handle["auto_clear_snapshots_after_attendance_report"] = should_clear
 
     return should_clear == get_auto_clear_after_attendance_report()
+
+
+def get_important_attendance_responses_are_ephemeral() -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        responses_are_ephemeral: bool = handle[
+            "important_attendance_responses_are_ephemeral"
+        ]
+
+    return responses_are_ephemeral
+
+
+def set_important_attendance_responses_are_ephemeral(are_ephemeral: bool) -> bool:
+    with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
+        handle["important_attendance_responses_are_ephemeral"] = are_ephemeral
+
+    return are_ephemeral == get_important_attendance_responses_are_ephemeral()

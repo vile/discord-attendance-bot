@@ -69,6 +69,22 @@ class SettingCommandsCog(
             ephemeral=True,
         )
 
+    @get_group.command(name="ephemeral", description=descriptions.SETTINGS_GET_EPHEMERAL)  # fmt: skip
+    async def get_attendance_commands_are_ephemeral(
+        self, interaction: discord.Interaction
+    ) -> None:
+        responses_are_ephemeral: bool = (
+            shelve_utils.get_important_attendance_responses_are_ephemeral()
+        )
+
+        embed: Embed = await create_embed(
+            f"Attendance command responses **{'are' if responses_are_ephemeral else 'are NOT'}** ephemeral"
+        )
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
     set_group: app_commands.Group = app_commands.Group(
         name="set", description="Set new settings"
     )
@@ -168,6 +184,35 @@ class SettingCommandsCog(
 
         embed: Embed = await create_embed(
             f"Successfully set auto clear for `{on_event}` to `{should_clear}`",
+        )
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
+    @set_group.command(name="ephemeral", description=descriptions.SETTINGS_SET_EPHEMERAL)  # fmt: skip
+    @app_commands.describe(are_ephemeral=descriptions.SETTINGS_SET_EPHEMERAL_ARE_EPHEMERAL)  # fmt: skip
+    async def set_attendance_commands_are_ephemeral(
+        self,
+        interaction: discord.Interaction,
+        are_ephemeral: bool,
+    ) -> None:
+        success: bool = shelve_utils.set_important_attendance_responses_are_ephemeral(
+            are_ephemeral
+        )
+
+        if not success:
+            embed: Embed = await create_embed_error(
+                f"There seems to have been a problem setting attendance commands to **{'ephemeral' if are_ephemeral else 'not ephemeral'}**. Try again"
+            )
+            await interaction.response.send_message(
+                embed=embed,
+                ephemeral=True,
+            )
+            return
+
+        embed: Embed = await create_embed(
+            f"Successfully set attendance commands to **{'ephemeral' if are_ephemeral else 'not ephemeral'}**"
         )
         await interaction.response.send_message(
             embed=embed,
