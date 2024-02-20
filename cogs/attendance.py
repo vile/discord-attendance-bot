@@ -304,7 +304,7 @@ class AttendanceCommandsCog(
 
         view = AttendanceExportButtons(attendance_data=attendance_met)
         await interaction.response.send_message(
-            content=content if content != "" else "",
+            content=content,
             embeds=embeds,
             view=view,
         )
