@@ -14,6 +14,7 @@ import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
 from cogs.utils.embed_generator import create_embed, create_embed_error
+from cogs.views.attendance_export import AttendanceExportButtons
 
 
 @app_commands.guild_only()
@@ -301,8 +302,11 @@ class AttendanceCommandsCog(
         if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
             content = ":bangbang: The amount of students present in this attendance report has exceeded the message length allowed by the Discord API. Therefore this message only shows a truncated list of students and their attendance."
 
+        view = AttendanceExportButtons(attendance_data=attendance_met)
         await interaction.response.send_message(
-            content=content if content != "" else "", embeds=embeds
+            content=content if content != "" else "",
+            embeds=embeds,
+            view=view,
         )
 
     @app_commands.command(name="clear", description=descriptions.ATTENDANCE_CLEAR_ATTENDANCE)  # fmt: skip
