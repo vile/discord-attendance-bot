@@ -16,4 +16,4 @@ CSV_HEADERS: Final[str] = "user_id,in_attendance"
 MYSTBIN_BASE_API: Final[str] = "https://api.mystb.in"
 MYSTBIN_PASTE_API: Final[str] = f"{MYSTBIN_BASE_API}/paste"
 
-BUTTON_VIEW_TIMEOUT: Final[int] = 180
+BUTTON_VIEW_TIMEOUT: Final[int] = 300
