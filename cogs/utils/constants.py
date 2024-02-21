@@ -17,3 +17,5 @@ MYSTBIN_BASE_API: Final[str] = "https://api.mystb.in"
 MYSTBIN_PASTE_API: Final[str] = f"{MYSTBIN_BASE_API}/paste"
 
 BUTTON_VIEW_TIMEOUT: Final[int] = 300
+
+PRESENCE_TASK_LOOP_SECONDS: Final[int] = 30

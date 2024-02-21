@@ -13,6 +13,7 @@ import cogs.utils.constants as constants
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
+from cogs.presence import PresenceCommandsCog
 from cogs.utils.embed_generator import create_embed, create_embed_error
 from cogs.views.attendance_export import AttendanceExportButtons
 
@@ -71,6 +72,9 @@ class AttendanceCommandsCog(
         self.snapshot_task.change_interval(seconds=task_interval)
         self.snapshot_task.start()
 
+        status_cog: PresenceCommandsCog = self.client.get_cog("presence")
+        status_cog.presence_task.start()
+
         auto_clear_message: str = ""
         if should_clear and cleared_success:
             auto_clear_message = "Snapshots have been auto cleared for this new session"
@@ -114,6 +118,9 @@ class AttendanceCommandsCog(
 
         self.voice_channel = 0
         self.snapshot_task.cancel()
+
+        status_cog: PresenceCommandsCog = self.client.get_cog("presence")
+        status_cog.presence_task.cancel()
 
         message_is_ephemeral: bool = (
             shelve_utils.get_important_attendance_responses_are_ephemeral()
@@ -351,6 +358,9 @@ class AttendanceCommandsCog(
 
         if not valid_instructor_in_channel:
             self.snapshot_task.cancel()
+
+            status_cog: PresenceCommandsCog = self.client.get_cog("presence")
+            status_cog.presence_task.cancel()
 
         self.logger.info(f"Taking member snapshot #{self.snapshot_task.current_loop}")
         shelve_utils.take_member_snapshot(members_as_ids)
