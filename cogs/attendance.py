@@ -302,12 +302,13 @@ class AttendanceCommandsCog(
         if len(embeds) >= constants.MAXMIMUM_EMBEDS_PER_MESSAGE:
             content = ":bangbang: The amount of students present in this attendance report has exceeded the message length allowed by the Discord API. Therefore this message only shows a truncated list of students and their attendance."
 
-        view = AttendanceExportButtons(attendance_data=attendance_met)
+        view = AttendanceExportButtons(self.client, attendance_met)
         await interaction.response.send_message(
             content=content,
             embeds=embeds,
             view=view,
         )
+        view.message = await interaction.original_response()
 
     @app_commands.command(name="clear", description=descriptions.ATTENDANCE_CLEAR_ATTENDANCE)  # fmt: skip
     async def clear_attendance(self, interaction: discord.Interaction) -> None:

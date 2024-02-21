@@ -1,21 +1,30 @@
 from io import StringIO
 from time import time
+from typing import Any
 from uuid import uuid4
 
 import discord
 import requests
-from discord import Embed
+from discord import ButtonStyle, Embed, app_commands
+from discord.ext import commands
+from discord.ui.item import Item
 from requests import Response
 
 import cogs.utils.constants as constants
+import cogs.utils.interaction_checks as interaction_checks
 from cogs.utils.embed_generator import create_embed, create_embed_error
 
 
 class AttendanceExportButtons(discord.ui.View):
     def __init__(
-        self, *, timeout: int = constants.BUTTON_VIEW_TIMEOUT, attendance_data: dict
+        self,
+        client: commands.Bot,
+        attendance_data: dict,
+        timeout: int = constants.BUTTON_VIEW_TIMEOUT,
     ) -> None:
+        self.client = client
         self.attendance_data = attendance_data
+        self.message = None
         super().__init__(timeout=timeout)
 
     async def attendance_data_to_csv(self) -> str:
@@ -77,3 +86,25 @@ class AttendanceExportButtons(discord.ui.View):
             f"Your CSV has been uploaded with the password ||`{password}`||\n\nhttps://mystb.in/{paste_id}"
         )
         await interaction.response.send_message(embed=embed)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if await interaction_checks.user_is_instructor_or_owner(
+            self.client, interaction
+        ):
+            return True
+        raise app_commands.CheckFailure()
+
+    async def on_error(
+        self, interaction: discord.Interaction, error: Exception, item: Item[Any]
+    ) -> None:
+        if isinstance(error, app_commands.CheckFailure):
+            await interaction.response.send_message(
+                "Sorry, you have to be an instructor to use this command.",
+                ephemeral=True,
+            )
+
+    async def on_timeout(self) -> None:
+        for child in self.children:
+            child.style = ButtonStyle.gray
+            child.disabled = True
+        await self.message.edit(view=self)
