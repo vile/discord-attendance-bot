@@ -1,8 +1,9 @@
 import discord
-from discord import app_commands
+from discord import Embed, app_commands
 from discord.ext import commands
 
 import cogs.utils.interaction_checks as interaction_checks
+from cogs.utils.embed_generator import create_embed_error
 
 
 class CommonBaseCog(commands.GroupCog):
@@ -16,7 +17,10 @@ class CommonBaseCog(commands.GroupCog):
         self, interaction: discord.Interaction, error: commands.CommandError
     ) -> None:
         if isinstance(error, app_commands.CheckFailure):
+            embed: Embed = await create_embed_error(
+                "Sorry, you have to be an instructor to use this command."
+            )
             await interaction.response.send_message(
-                "Sorry, you have to be an instructor to use this command.",
+                embed=embed,
                 ephemeral=True,
             )

@@ -98,8 +98,11 @@ class AttendanceExportButtons(discord.ui.View):
         self, interaction: discord.Interaction, error: Exception, item: Item[Any]
     ) -> None:
         if isinstance(error, app_commands.CheckFailure):
+            embed: Embed = await create_embed_error(
+                "Sorry, you have to be an instructor to use this command."
+            )
             await interaction.response.send_message(
-                "Sorry, you have to be an instructor to use this command.",
+                embed=embed,
                 ephemeral=True,
             )
 
