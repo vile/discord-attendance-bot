@@ -154,6 +154,8 @@ Use the `.env` file as normal (include your `DISCORD_BOT_TOKEN` and `GUILD_ID`),
 
 Compose the docker image from the `Dockerfile` and start a new container.
 Optionally pass the `-d` flag to start the container in the background.
+When using `make` commands, pass all desired flags under `FLAGS` (e.g., `FLAGS='-d'`).
+All `make docker*` targets support `FLAGS`.
 
 ```bash
 make dockerup-build
