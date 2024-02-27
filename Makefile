@@ -8,8 +8,8 @@ deps:
 
 start :; poetry run python3 main.py
 
-dockerup-build :; docker compose up --build --remove-orphans
+dockerup-build :; docker compose up --build --remove-orphans $(FLAGS)
 
-dockerup :; docker compose up
+dockerup :; docker compose up $(FLAGS)
 
-dockerdown :; docker compose down --remove-orphans
+dockerdown :; docker compose down --remove-orphans $(FLAGS)
