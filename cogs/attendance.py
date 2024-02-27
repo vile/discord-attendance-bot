@@ -96,16 +96,6 @@ class AttendanceCommandsCog(
 
     @app_commands.command(name="stop", description=descriptions.ATTENDANCE_STOP_SESSION)  # fmt: skip
     async def stop_session(self, interaction: discord.Interaction) -> None:
-        if self.snapshot_task.is_being_cancelled():
-            embed: Embed = await create_embed_error(
-                "This session is already being canceled, please wait",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
-            )
-            return
-
         if not self.snapshot_task.is_running():
             embed: Embed = await create_embed_error(
                 "A session is not currently running, so there is nothing to stop",
@@ -341,9 +331,6 @@ class AttendanceCommandsCog(
 
     @tasks.loop()
     async def snapshot_task(self) -> None:
-        if self.snapshot_task.is_being_cancelled():
-            return
-
         try:
             target_vc_memberlist: list[discord.Member] = self.client.get_channel(self.voice_channel).members  # fmt: skip
         except AttributeError:

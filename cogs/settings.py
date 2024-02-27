@@ -126,9 +126,9 @@ class SettingCommandsCog(
         attendance_cog: commands.GroupCog = self.client.get_cog("attendance")
         snapshot_task: tasks.Loop = attendance_cog.snapshot_task
 
-        if snapshot_task.is_running() or snapshot_task.is_being_cancelled():
+        if snapshot_task.is_running():
             embed: Embed = await create_embed_error(
-                "You can't set the snapshot interval while a session is running or being canceled. Stop your current session or wait a few seconds for the current session to finish canceling",
+                "You can't set the snapshot interval while a session is running. Stop your current session to change the interval",
             )
             await interaction.response.send_message(
                 embed=embed,
