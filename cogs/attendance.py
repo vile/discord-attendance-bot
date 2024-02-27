@@ -354,7 +354,7 @@ class AttendanceCommandsCog(
 
     def cog_unload(self) -> None:
         self.voice_channel = 0
-        self.snapshot_task.stop()
+        self.snapshot_task.cancel()
 
 
 async def setup(client: commands.Bot) -> None:
