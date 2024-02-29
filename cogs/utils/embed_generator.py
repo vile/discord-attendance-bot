@@ -1,5 +1,6 @@
-from discord import Embed, Colour
 from typing import Union
+
+from discord import Colour, Embed
 
 
 async def create_embed(
