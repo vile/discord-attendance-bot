@@ -8,7 +8,8 @@ from discord.ext import commands
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
-from cogs.utils.embed_generator import create_embed, create_embed_error
+from cogs.enums.embed_type import EmbedType
+from cogs.utils.macro import send_embed
 
 
 @app_commands.guild_only()
@@ -27,21 +28,15 @@ class InstructorCommandsCog(
     ) -> None:
         success: bool = shelve_utils.add_instructor(member.id)
         if not success:
-            embed: Embed = await create_embed_error(
-                "Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="Sorry, I couldn't add this member as an instructor. Are they already an instructor?",
             )
             return
 
-        embed: Embed = await create_embed(
-            f"Successfully added {member.mention} as an instructor"
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=True,
+        await send_embed(
+            interaction, message=f"Successfully added {member.mention} as an instructor"
         )
 
     @app_commands.command(name="remove", description=descriptions.INSTRUCTOR_REMOVE)  # fmt: skip
@@ -51,21 +46,16 @@ class InstructorCommandsCog(
     ) -> None:
         success: bool = shelve_utils.remove_instructor(member.id)
         if not success:
-            embed: Embed = await create_embed_error(
-                "I couldn't remove this member. Are you sure they're an existing instructor?",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="I couldn't remove this member. Are you sure they're an existing instructor?",
             )
             return
 
-        embed: Embed = await create_embed(
-            f"Successfully removed  {member.mention} as an instructor"
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=True,
+        await send_embed(
+            interaction,
+            message=f"Successfully removed {member.mention} as an instructor",
         )
 
     @app_commands.command(name="show", description=descriptions.INSTRUCTOR_SHOW)  # fmt: skip
@@ -75,8 +65,11 @@ class InstructorCommandsCog(
         if formatted_message == "":
             formatted_message = "There are no instructors to show!"
 
-        embed: Embed = await create_embed(formatted_message, title="Instructors")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await send_embed(
+            interaction,
+            message=formatted_message,
+            title="Instructors",
+        )
 
 
 async def setup(client: commands.Bot) -> None:

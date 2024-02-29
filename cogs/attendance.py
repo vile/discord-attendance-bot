@@ -13,8 +13,9 @@ import cogs.utils.constants as constants
 import cogs.utils.descriptions as descriptions
 import cogs.utils.shelve_utils as shelve_utils
 from cogs.base.common import CommonBaseCog
+from cogs.enums.embed_type import EmbedType
 from cogs.presence import PresenceCommandsCog
-from cogs.utils.embed_generator import create_embed, create_embed_error
+from cogs.utils.macro import send_embed
 from cogs.views.attendance_export import AttendanceExportButtons
 
 
@@ -36,12 +37,10 @@ class AttendanceCommandsCog(
         channel: Union[discord.VoiceChannel, discord.StageChannel],
     ) -> None:
         if self.snapshot_task.is_running():
-            embed: Embed = await create_embed_error(
-                f"A session is already running in {self.client.get_channel(self.voice_channel).mention}",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message=f"A session is already running in {self.client.get_channel(self.voice_channel).mention}",
             )
             return
 
@@ -54,12 +53,10 @@ class AttendanceCommandsCog(
                 break
 
         if not valid_instructor_in_channel:
-            embed: Embed = await create_embed_error(
-                f"You or another instructor needs to be in {channel.mention} to start a session",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message=f"You or another instructor needs to be in {channel.mention} to start a session",
             )
             return
 
@@ -86,23 +83,19 @@ class AttendanceCommandsCog(
         message_is_ephemeral: bool = (
             shelve_utils.get_important_attendance_responses_are_ephemeral()
         )
-        embed: Embed = await create_embed(
-            f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**"
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=message_is_ephemeral,
+        await send_embed(
+            interaction,
+            is_ephemeral=message_is_ephemeral,
+            message=f"Started a session in {channel.mention} and taking snapshots every {task_interval} seconds! **{auto_clear_message}**",
         )
 
     @app_commands.command(name="stop", description=descriptions.ATTENDANCE_STOP_SESSION)  # fmt: skip
     async def stop_session(self, interaction: discord.Interaction) -> None:
         if not self.snapshot_task.is_running():
-            embed: Embed = await create_embed_error(
-                "A session is not currently running, so there is nothing to stop",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="A session is not currently running, so there is nothing to stop",
             )
             return
 
@@ -115,12 +108,10 @@ class AttendanceCommandsCog(
         message_is_ephemeral: bool = (
             shelve_utils.get_important_attendance_responses_are_ephemeral()
         )
-        embed: Embed = await create_embed(
-            "Successfully stopped the active session, no longer taking snapshots",
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=message_is_ephemeral,
+        await send_embed(
+            interaction,
+            is_ephemeral=message_is_ephemeral,
+            message="Successfully stopped the active session, no longer taking snapshots",
         )
 
     @app_commands.command(name="stats", description=descriptions.ATTENDANCE_STATS_SESSION)  # fmt: skip
@@ -128,12 +119,10 @@ class AttendanceCommandsCog(
         self, interaction: discord.Interaction
     ) -> None:
         if not self.snapshot_task.is_running():
-            embed: Embed = await create_embed_error(
-                f"No active session is running to get stats for"
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message=f"No active session is running to get stats for",
             )
             return
 
@@ -147,7 +136,7 @@ class AttendanceCommandsCog(
             int(time.time()) - assumed_session_length
         )
 
-        message_for_embed: str = textwrap.dedent(
+        message: str = textwrap.dedent(
             f"""
             - **Number of Snapshots**: `{num_snapshots}`
             - **Snapshot Interval**: `{snapshot_interval}` seconds
@@ -158,24 +147,20 @@ class AttendanceCommandsCog(
         message_is_ephemeral: bool = (
             shelve_utils.get_important_attendance_responses_are_ephemeral()
         )
-        embed: Embed = await create_embed(
-            message_for_embed,
+        await send_embed(
+            interaction,
+            is_ephemeral=message_is_ephemeral,
+            message=message,
             title="Active session stats",
-        )
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=message_is_ephemeral,
         )
 
     @app_commands.command(name="get", description=descriptions.ATTENDANCE_GET_ATTENDANCE)  # fmt: skip
     async def get_attendance(self, interaction: discord.Interaction) -> None:
         if self.snapshot_task.is_running():
-            embed: Embed = await create_embed_error(
-                "Can't report attendance while a session is active. Stop the current session if you want to get a report",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="Can't report attendance while a session is active. Stop the current session if you want to get a report",
             )
             return
 
@@ -183,24 +168,20 @@ class AttendanceCommandsCog(
             interaction.guild.get_member(self.client.application_id)
         )
         if not permissions.send_messages:
-            embed: Embed = await create_embed_error(
-                f"I can't send messages in this channel. Make sure I have permissions from one of my roles or through a channel override in {interaction.channel.mention}. Then, use this command again to get an attendance report",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message=f"I can't send messages in this channel. Make sure I have permissions from one of my roles or through a channel override in {interaction.channel.mention}. Then, use this command again to get an attendance report",
             )
             return
 
         snapshots: list[int] = shelve_utils.get_snapshots()
 
         if len(snapshots) == 0:
-            embed: Embed = await create_embed_error(
-                "No available stopshot data to report attendance with",
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="No available stopshot data to report attendance with",
             )
             return
 
@@ -311,22 +292,20 @@ class AttendanceCommandsCog(
     async def clear_attendance(self, interaction: discord.Interaction) -> None:
         success: bool = shelve_utils.clear_snapshots()
         if not success:
-            embed: Embed = await create_embed_error(
-                "Seems I couldn't clear attendance snapshots. Try again"
-            )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True,
+            await send_embed(
+                interaction,
+                embed_type=EmbedType.ERROR,
+                message="Seems I couldn't clear attendance snapshots. Try again",
             )
             return
 
         message_is_ephemeral: bool = (
             shelve_utils.get_important_attendance_responses_are_ephemeral()
         )
-        embed: Embed = await create_embed("Successfully cleared attendance snapshots")
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=message_is_ephemeral,
+        await send_embed(
+            interaction,
+            is_ephemeral=message_is_ephemeral,
+            message="Successfully cleared attendance snapshots",
         )
 
     @tasks.loop()
