@@ -1,10 +1,10 @@
 import logging
 import os
 import textwrap
-import typing
+from typing import Literal
 
 import discord
-from discord import Embed, app_commands
+from discord import app_commands
 from discord.ext import commands, tasks
 
 import cogs.utils.descriptions as descriptions
@@ -138,7 +138,7 @@ class SettingCommandsCog(
     async def set_auto_clear(
         self,
         interaction: discord.Interaction,
-        on_event: typing.Literal["on new session", "after report"],
+        on_event: Literal["on new session", "after report"],
         should_clear: bool,
     ) -> None:
         match on_event:
