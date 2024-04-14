@@ -23,7 +23,7 @@ def add_instructor(user_id: Member.id) -> bool:
 
 
 def remove_instructor(user_id: Member.id) -> bool:
-    if not user_id in get_instructors():
+    if user_id not in get_instructors():
         return False
 
     with shelve.open(constants.SHELVE_DATABASE_NAME) as handle:
@@ -31,7 +31,7 @@ def remove_instructor(user_id: Member.id) -> bool:
         temp_instructors.remove(user_id)
         handle["instructors"] = temp_instructors
 
-    return not user_id in get_instructors()
+    return user_id not in get_instructors()
 
 
 def take_member_snapshot(member_ids: list[int]) -> None:

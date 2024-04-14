@@ -39,7 +39,9 @@ class SyncComanndsCog(
             else:
                 synced = await ctx.bot.tree.sync()
 
-            message: str = f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            message: str = (
+                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            )
             self.logger.info(message)
             if can_send_messages:
                 await ctx.send(message)

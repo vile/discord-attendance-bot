@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Union
 
 import discord
-from discord import Embed, app_commands
+from discord import app_commands
 from discord.ext import commands, tasks
 
 import cogs.utils.constants as constants
@@ -122,7 +122,7 @@ class AttendanceCommandsCog(
             await send_embed(
                 interaction,
                 embed_type=EmbedType.ERROR,
-                message=f"No active session is running to get stats for",
+                message="No active session is running to get stats for",
             )
             return
 
